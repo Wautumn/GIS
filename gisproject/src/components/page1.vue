@@ -79,25 +79,33 @@
     
     </el-menu>
     </el-aside>
+    <el-main>
+        <ecocircle></ecocircle>
+    </el-main>
 </el-container>
 
-  <el-container>
-      <el-main>
-
-      </el-main>
-  </el-container>
+  <!--<el-container>-->
+      <!--<el-main>-->
+          <!--<ecocircle></ecocircle>-->
+      <!--</el-main>-->
+  <!--</el-container>-->
 
 
  </div>
 </template>
 
 <script>
+    import ecocircle from '@/components/ecocircle.vue';
   export default {
+      components: {
+          ecocircle,
+
+      },
     methods: {
-      handleOpen(key, keyPath) {
+      handleOpen() {
         //console.log(key, keyPath);
       },
-      handleClose(key, keyPath) {
+      handleClose() {
         //console.log(key, keyPath);
       }
     }
