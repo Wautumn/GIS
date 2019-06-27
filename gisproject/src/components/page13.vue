@@ -3,19 +3,33 @@
 <el-card>
     <div>
         <h2>直线距离</h2>
-        <div><a href=""
+         <el-divider></el-divider>
+        <!-- <div><a href=""
                 target="view_window">查看地图</a></div>
+<div align="center">
+            <el-button type="primary" icon="el-icon-search">
+                <a class="a-style"
+                   @click="linkDownload('http://www.arcgis.com/home/webmap/viewer.html?url=http%3A%2F%2F10.60.42.201%3A6447%2Farcgis%2Frest%2Fservices%2FDu%2Fyangpu_reli%2FMapServer&source=sd')">地图
+
+                </a>
+            </el-button>
+         
+        </div> -->
+
         <div>以人民广场为中心点，分别构建半径不同的同心圆，每个同心圆之间的半径差值相同，
             两个同心圆间所含的文化创新点的数量作为外圈同心圆下的文化产业数量。（选择密度，即
             单位面积的文化产业的数量而不是数量的原因：研究的是中心点的分布，在占地面积不同的
             情况下，数量的比较没有意义）
         </div>
+        <div align="center">
         <img src="../../static/image/环.jpg">
-
+</div>
         <h4>构建模型</h4>
         <div>模型猜测：</div>
         <div> 曲线分布，利用多项式回归模型拟合数据</div>
+        <div align="center">
         <img src="../../static/image/模型拟合.jpg">
+        </div>
         <div>最大次幂为 5：</div>
         <div> 次数分别为 0，-4.55155036e+01 ， 2.97867147e+00， -9.72419100e-02， 1.56039741e-
             03， -9.76548447e-06
@@ -35,7 +49,9 @@
             并按照第二问的思路将距离数据和距离人民广场“直线距离”的数据进行回归模型的误差值
             分析。
         </div>
+        <div align="center">
         <img src="../../static/image/实际距离分布.jpg">
+        </div>
   <el-divider></el-divider>
         <h1>最终结论</h1>
         <div>
@@ -57,7 +73,12 @@
 
 <script>
     export default {
-        name: "page13"
+        name: "page13",
+         methods: {
+            linkDownload(url) {
+                window.open(url, '_blank') // 新窗口打开外链接
+            },
+        }
     }
 </script>
 

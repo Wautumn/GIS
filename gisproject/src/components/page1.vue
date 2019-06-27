@@ -1,7 +1,7 @@
 <template>
-    <div>
-        <el-container height="800px" background-color="#545c64">
-            <el-aside width="250px" height="800px" background-color="#545c64">
+    <div id="pg1">
+        <el-container background-color="#545c64">
+            <el-aside width="250px"  background-color="#545c64">
                 <el-menu
                         default-active="1"
                         class="el-menu-vertical-demo"
@@ -72,6 +72,12 @@
                 </el-menu>
             </el-aside>
             <el-main>
+                  <div v-if="this.currentindex===0">
+                    <div align="center">
+    
+      <img src="../../static/image/比例.png" class="image" style="height: 500px;width: 800px">
+      </div>
+                </div>
                 <div v-if="this.currentindex===1">
                     <page11></page11>
                 </div>
@@ -175,3 +181,9 @@
         }
     }
 </script>
+
+<style>
+.pg1{
+ background-color: "#545c64"
+}
+</style>

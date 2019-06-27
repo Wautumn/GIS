@@ -1,16 +1,28 @@
 <template>
+
     <div>
+    <el-card>
         <h1>相似度分析</h1>
-        <a href="http://www.arcgis.com/home/webmap/viewer.html?url=https%3A%2F%2Flocalhost%3A6443%2Farcgis%2Frest%2Fservices%2F%25E6%25A0%2585%25E6%25A0%25BC%2FMapServer&source=sd"
+         <el-divider></el-divider>
+        <!-- <a href="http://www.arcgis.com/home/webmap/viewer.html?url=https%3A%2F%2Flocalhost%3A6443%2Farcgis%2Frest%2Fservices%2F%25E6%25A0%2585%25E6%25A0%25BC%2FMapServer&source=sd"
            target="view_window">
             查看地图
-        </a>
+        </a> -->
+<div align="center">
+            <el-button type="primary" icon="el-icon-search">
+                <a class="a-style"
+                   @click="linkDownload('http://www.arcgis.com/home/webmap/viewer.html?url=https%3A%2F%2Flocalhost%3A6443%2Farcgis%2Frest%2Fservices%2F%25E6%25A0%2585%25E6%25A0%25BC%2FMapServer&source=sd')">地图
 
+                </a>
+            </el-button>
+         
+        </div> 
+        <br>
         <div>
             根据上海市 POI 数据的 FEATCODE 将所有产业进行大致的分类，将分好类的
             POI 图层转化为栅格图层；再通过多元分析波段集统计输出相关统计情况。
         </div>
-        <el-carousel :interval="5000" arrow="always" height="700px">
+        <el-carousel :interval="5000" arrow="always" height="600px">
             <el-carousel-item v-for="(img,index) in imgs" :key="index">
                 <h3 style="text-align: center"><img v-bind:src="img.url" style="width: 500px;height: 400px"></h3>
                 <h3 style="text-align: center">{{img.name}}</h3>
@@ -31,6 +43,7 @@
            地参观，于是文化创意产业逐渐具有休闲娱乐功能。因此与娱乐休闲相关的餐饮产业在文化
                创意产业周遭也具有了很好的发展机遇。</div>
        </div>
+    </el-card>
     </div>
 </template>
 
@@ -85,6 +98,11 @@
 
 
             }
+        },
+         methods: {
+            linkDownload(url) {
+                window.open(url, '_blank') // 新窗口打开外链接
+            },
         }
     }
 </script>

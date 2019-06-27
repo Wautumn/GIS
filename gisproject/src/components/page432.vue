@@ -105,10 +105,13 @@ export default {
   data () {
     return {
       //
-      linkDownload (url) {
+    
+    }
+  },
+  methods:{
+  linkDownload (url) {
     window.open(url,'_blank') // 新窗口打开外链接
 },
-    }
   }
 }
 </script>

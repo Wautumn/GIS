@@ -1,41 +1,81 @@
 <template>
     <div >
+        <el-card>
         <h2>重新规划
-            <a href="http://www.arcgis.com/home/webmap/viewer.html?url=http%3A%2F%2F10.60.42.201%3A6447%2Farcgis%2Frest%2Fservices%2FDu%2Fyangpu_reli%2FMapServer&source=sd"
+                 <el-divider></el-divider>
+            <!-- <a href="http://www.arcgis.com/home/webmap/viewer.html?url=http%3A%2F%2F10.60.42.201%3A6447%2Farcgis%2Frest%2Fservices%2FDu%2Fyangpu_reli%2FMapServer&source=sd"
                target="view_window">地图
-            </a>
+            </a> -->
         </h2>
+        <div align="center">
+            <el-button type="primary" icon="el-icon-search">
+                <a class="a-style"
+                   @click="linkDownload('http://www.arcgis.com/home/webmap/viewer.html?url=http%3A%2F%2F10.60.42.201%3A6447%2Farcgis%2Frest%2Fservices%2FDu%2Fyangpu_reli%2FMapServer&source=sd')">地图
+
+                </a>
+            </el-button>
+         
+        </div>
+          <br>
         <span style="width: 1400px;">
         以五角场商业圈为新的文化产业区域，将同济大学、复旦大学、上海财经大学等附近沿线高校联系在一起，融合五角场的经济体系，打造一种商业——科技——教育等多方面一体化的文化创意产业区。
     </span>
         <h2>Huff模型
-            <a href="http://www.arcgis.com/home/webmap/viewer.html?url=http%3A%2F%2F10.60.42.201%3A6447%2Farcgis%2Frest%2Fservices%2FDu%2FHuff_Center_and_Result%2FMapServer&source=sd"
+                 <el-divider></el-divider>
+            <!-- <a href="http://www.arcgis.com/home/webmap/viewer.html?url=http%3A%2F%2F10.60.42.201%3A6447%2Farcgis%2Frest%2Fservices%2FDu%2FHuff_Center_and_Result%2FMapServer&source=sd"
                target="view_window">地图
-            </a>
+            </a> -->
         </h2>
+        <div align="center">
+            <el-button type="success" icon="el-icon-search">
+                <a class="a-style"
+                   @click="linkDownload('http://www.arcgis.com/home/webmap/viewer.html?url=http%3A%2F%2F10.60.42.201%3A6447%2Farcgis%2Frest%2Fservices%2FDu%2FHuff_Center_and_Result%2FMapServer&source=sd')">地图
+
+                </a>
+            </el-button>
+         
+        </div>
+        <br>
         <span style="width: 1400px;">
         将杨浦区按街道划分为不同街区，考虑人口、科技产业数量、高等院校个数、街区房价为因素，计算Huff模型的吸引指数，检查五角场是否为兴趣最大的点。
     根据经验判断，四个因素的优先级初步确定为：高校数量>人口数量>产业数量>房屋均价，因此取经验系数为3，2，4，1。
         由计算结果可知，五角场街道的A值最大，即得出结论，以五角场为中心建立文化创意产业示范区是合理的改进措施。
     </span>
         <h2>经济适用房选址
-            <a href="http://www.arcgis.com/home/webmap/viewer.html?url=http%3A%2F%2F10.60.42.201%3A6447%2Farcgis%2Frest%2Fservices%2FDu%2FCommute_Route_Start_End%2FMapServer&source=sd"
+                 <el-divider></el-divider>
+            <!-- <a href="http://www.arcgis.com/home/webmap/viewer.html?url=http%3A%2F%2F10.60.42.201%3A6447%2Farcgis%2Frest%2Fservices%2FDu%2FCommute_Route_Start_End%2FMapServer&source=sd"
                target="view_window">地图
-            </a>
+            </a> -->
         </h2>
+        <div align="center">
+            <el-button type="info" icon="el-icon-search">
+                <a class="a-style"
+                   @click="linkDownload('http://www.arcgis.com/home/webmap/viewer.html?url=http%3A%2F%2F10.60.42.201%3A6447%2Farcgis%2Frest%2Fservices%2FDu%2FCommute_Route_Start_End%2FMapServer&source=sd')">地图
+
+                </a>
+            </el-button>
+         
+        </div>
+          <br>
         <span style="width: 1400px;">
         取产业人才缺口和交通便利性为考虑因素。
         产业人才缺口使用该区的人口量和产业量进行估算，考虑到户籍人口和常住人口差异较大，且常住人口更加符合实际情况，因此使用常住人口来进行估算。
         交通便利度以地铁为主要考虑因素，因为考虑到经济适用房及价格问题，此处以公共交通为主要考虑因素。衡量标准为到地铁线的距离，使用缓冲区功能，为距离地铁线2km的区域提供较高的权重。
         对人才缺口和地铁交通便利度进行综合考虑，可以得到人才缺口较大、公共交通较为便利的区域。
     </span>
+    </el-card>
     </div>
 </template>
 
 <script>
     /* eslint-disable */
     export default {
-        name: "page41"
+        name: "page41",
+         methods: {
+            linkDownload(url) {
+                window.open(url, '_blank') // 新窗口打开外链接
+            },
+        }
     }
 </script>
 
