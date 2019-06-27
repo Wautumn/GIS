@@ -94,6 +94,9 @@
                 <li>
                     <a onclick="changePage(5, 2)">Huff 模型</a>
                 </li>
+                <li>
+                    <a onclick="changePage(5, 3)">经济适用房</a>
+                </li>
             </ul>
         </div>
         <!--<div class="item" onmouseover="activeMsg(7)" onmouseout="removeActiveId()" onclick="changePage(7)">-->
@@ -135,6 +138,8 @@
         <% include pageSearch.ejs %>
         <% include ecoCircleAddress.ejs %>
         <% include myclass.ejs %>
+        <% include myclass2.ejs %>
+        <% include myclass3.ejs %>
     </div>
 </div>
 
@@ -240,9 +245,15 @@
             $('.pageFive').removeClass('active');
             clearMap();
             if (subId === 1) {
-                $('#5-1').removeClass('active');
+                clearPage();
+                $('.myclass').removeClass('active');
             } else if (subId === 2) {
-                $('#5-2').removeClass('active');
+                clearPage();
+                $('.myclass2').removeClass('active');
+            }
+            else if (subId === 3) {
+                clearPage();
+                $('.myclass3').removeClass('active');
             }
         } else if (curPage === 7) {
             window.open('/analytics', '_blank')
