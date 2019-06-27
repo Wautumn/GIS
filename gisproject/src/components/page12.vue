@@ -1,12 +1,13 @@
 <template>
+<el-card>
     <div>
-        <div><h2>内中外环分布</h2></div>
+        <h2>内中外环分布</h2>
         <a href="http://www.arcgis.com/home/webmap/viewer.html?url=https%3A%2F%2Flocalhost%3A6443%2Farcgis%2Frest%2Fservices%2F%25E7%258E%25AF%25E6%2595%25B0%25E6%258D%25AE%2FMapServer&source=sd"
            target="view_window">
             查看地图
         </a>
         <br>
-        <hr>
+       
         <div>
             <div>主要操作：按位置选择，内环外环中环面，按位置选择，选出在面内的所有点</div>
             <div>内环：22087</div>
@@ -47,7 +48,7 @@
 
         </div>
     </div>
-
+</el-card>
 </template>
 
 <script>

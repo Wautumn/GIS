@@ -1,4 +1,6 @@
 <template>
+<div class="pageecoCircle container active">
+<el-card>
     <div>
         <h2>直线距离</h2>
         <div><a href=""
@@ -26,7 +28,7 @@
         </div>
         <div>当与人民广场的距离大于 20km 时，文化产业的密度接近于 0</div>
 
-
+  <el-divider></el-divider>
         <h2>实际距离</h2>
         <div>
             根据 ArcGIS 的路径分析生成的每个创新文化点距离人民广场的距离，（OD）处理数据
@@ -34,7 +36,7 @@
             分析。
         </div>
         <img src="../../static/image/实际距离分布.jpg">
-
+  <el-divider></el-divider>
         <h1>最终结论</h1>
         <div>
             经过讨论和数据正确性的排查，我们得出以下三个结论：
@@ -49,6 +51,8 @@
             说明实际距离与文化产业密度的相关性更强，实际距离对文化产业的影响更大
         </div>
     </div>
+</el-card>
+</div>
 </template>
 
 <script>
