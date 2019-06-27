@@ -72,7 +72,7 @@
     </el-menu>
     </el-aside>
     <el-main>
-        <page11></page11>
+        <page431></page431>
     </el-main>
 </el-container>
 
@@ -87,14 +87,15 @@
 </template>
 
 <script>
+/* eslint-disable */
     import ecocircle from '@/components/ecocircle.vue';
     import page11 from '@/components/page11.vue';
     import page31 from '@/components/page31.vue';
     import page32 from '@/components/page32.vue';
     import page41 from '@/components/page41.vue';
     import page42 from '@/components/page42.vue';
-    import page43 from '@/components/page43.vue';
-    
+    import page431 from '@/components/page431.vue';
+    import page432 from '@/components/page432.vue';
   export default {
       components: {
           ecocircle,
@@ -103,7 +104,8 @@
           page32,
           page41,
           page42,
-          page43,
+          page431,
+          page432,
 
       },
     methods: {
