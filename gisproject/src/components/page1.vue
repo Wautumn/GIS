@@ -52,9 +52,9 @@
                             <span>文化产业重新规划</span>
                         </template>
                         <el-menu-item-group>
-                            <el-menu-item index="5-1" @click="handleClick(7)">杨浦区产业分析</el-menu-item>
-                            <el-menu-item index="5-2" @click="handleClick(8)">Huff模型</el-menu-item>
-                            <el-menu-item index="5-3" @click="handleClick(9)">经济适用房</el-menu-item>
+                            <el-menu-item index="5-1" @click="handleClick(7)">具体规划</el-menu-item>
+                            <!--<el-menu-item index="5-2" @click="handleClick(8)">Huff模型</el-menu-item>-->
+                            <!--<el-menu-item index="5-3" @click="handleClick(9)">经济适用房</el-menu-item>-->
                         </el-menu-item-group>
                     </el-submenu>
 
