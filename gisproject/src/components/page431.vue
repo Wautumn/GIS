@@ -19,15 +19,22 @@
     <br><br>
   <el-divider></el-divider>
     <h3>环同济经济圈文化产业</h3>
-    <el-row>
-  <el-col :span="8">
-    <el-card :body-style="{ padding: '0px' }">
+    <el-row gutter="20">
+  <el-col :span="12">
+    <el-card :body-style="{ width:'120px' }">
       <img src="@/assets/img411.png" class="image">
     </el-card>
   </el-col>
-  <el-col :span="16">
-    <el-card :body-style="{ padding: '0px' }">
+  <el-col :span="12">
+    <el-card :body-style="{ width:'60px' }">
       <img src="@/assets/img412.png" class="image">
+     <div style="width: 400px;">
+      <br> <br> <br>
+      <span>  杨浦区文化产业经济规模：646.695亿元</span>
+      <br>
+         <span>    环同济经济圈：102.56亿元    </span>
+          <br> <br>
+      </div>
     </el-card>
   </el-col>
 </el-row>
@@ -88,10 +95,17 @@
     </el-card>
 
     <br><br>
+    <span>对核心区及扩展区文化企业名称进行分词，前 80 位关键词根据其词频生成的词云：</span>
+     <br><br>
+          <div align="center">
+      <img src="../../static/image/clous.png" class="image">
+      </div>
+      <br><br>
+      <span>环同济经济圈内的文化产业的企业类型主要以设计、城规等为主，与同济大学的特色专业城市规划、设计相关。</span>
   <h3>文化产业链</h3>
 <span>目前，环同济知识经济圈中集聚的企业以建筑与城市规划设计为龙头，辅以景观设计、环保工程设计、工程咨询、汽车设计、软件设计、艺术传媒设计、教育培训等知识服务业。这些企业中有2.4万余人的高素质就业人口，形成了中国最大的设计产业集群。</span>
 <span>同济大学以学科链嵌入产业链实现全面功能对接，积极形成紧密的产学研战略联盟。</span>
-
+ <br><br>
 
 </el-card>
 
@@ -101,7 +115,7 @@
 </template>
 
 <script>
-
+ /* eslint-disable */
 export default {
  
   components: {
