@@ -6,7 +6,7 @@
       <el-divider></el-divider>
 
 
-      
+
     <h3>核心区</h3>
     <span>该产业基地的“核心圈”以同济大学四平路校区为核心，包括密云路、中山北二路、江浦路、控江路、大连路围合组成的区域，面积约2.6平方公里。</span>
     <!-- <el-divider></el-divider> -->
@@ -15,9 +15,11 @@
     <span>在此基础上进一步向外扩展，形成四个“辐射点”，包括新江湾城辐射点、森林公园辐射点、黄兴公园辐射点、滨江辐射点。</span>
     <br><br>
     <div align="center">
-          <el-button type="primary" icon="el-icon-search">
-               <a class="a-style" @click="linkDownload('https://www.baidu.com')">查看地图</a>
-              </el-button>
+        <el-button type="primary" icon="el-icon-search">
+            <a  class="a-style" @click="linkDownload('http://www.arcgis.com/home/webmap/viewer.html?url=https%3A%2F%2Flocalhost%3A6443%2Farcgis%2Frest%2Fservices%2F%25E7%258E%25AF%2FMapServer&source=sd')">查看地图
+
+            </a>
+        </el-button>
     </div>
     <br><br>
   <el-divider></el-divider>
@@ -41,7 +43,7 @@
     </el-card>
   </el-col>
 </el-row>
- 
+
 <el-divider></el-divider>
     <h3>文化产业企业</h3>
       <el-card>
@@ -50,7 +52,7 @@
        <img src="@/assets/img413.png" class="image">
       </div></el-col>
   <el-col :span="12"><div class="grid-content bg-purple-light">
-      
+
         <el-card>
     <el-table
     :data="tableData"
@@ -88,13 +90,13 @@
     </el-table-column>
   </el-table>
   </el-card>
-      
-      
-      
-      
+
+
+
+
       </div></el-col>
 </el-row>
-     
+
     </el-card>
 
     <br><br>
@@ -120,7 +122,7 @@
 <script>
  /* eslint-disable */
 export default {
- 
+
   components: {
 
   },
@@ -148,7 +150,7 @@ export default {
           name2: '3',
           date3: '科研机构',
           name3: '66',
-          
+
         }, {
           date1: '设计机构',
           name1: '9',
@@ -173,7 +175,7 @@ export default {
           date3: '文化活动场所',
           name3: '16',
          },
-        
+
 
         ]
     }
@@ -187,7 +189,7 @@ export default {
      linkDownload (url) {
       window.open(url,'_blank') // 新窗口打开外链接
     }
-      
+
     }
 }
 </script>
