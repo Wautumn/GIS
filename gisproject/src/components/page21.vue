@@ -1,13 +1,13 @@
 <template>
+    <!--历史对比-->
     <div>
-       <div>上海文化产业分布<a href=""  target="view_window">查看地图</a></div>
-
+历史
     </div>
 </template>
 
 <script>
     export default {
-        name: "page11"
+        name: "page21"
     }
 </script>
 
