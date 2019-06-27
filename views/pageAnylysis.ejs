@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>热点分析</title>
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        #sidebar {
+            z-index: 99;
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 97%;
+            background: rgba(61, 59, 60, 0.75);
+            width: 320px;
+            font-family: "Avenir Next W00", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            overflow-y: auto;
+        }
+
+        .label {
+            color: white;
+        }
+
+        #legendDiv {
+            padding-top: 20px;
+            padding-left: 20px;
+            color: white;
+            background-color: transparent;
+            box-shadow: none;
+        }
+
+        #legendDiv_msg {
+            display: none;
+        }
+
+        #hotspotButton {
+            font-family: "Avenir Next W00", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            border: none;
+            background-color: rgba(229, 89, 52, 0.75);
+            color: #FFF;
+            margin: 1px;
+            width: 50%;
+            padding: 10px;
+            overflow: auto;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.7em;
+        }
+
+        .tundra .dijitPopup {
+            background-color: white;
+        }
+
+        #featcode {
+            margin: 10px;
+            width: 153px;
+            background: none;
+            border: none;
+            border-bottom: 1px solid white;
+            color: white;
+            text-align: center;
+            outline: none;
+            height: 25px;
+        }
+        .selectAnylysis { position: relative; display: block; margin: 0 auto; width: 10%; max-width: 325px; color: #cccccc; vertical-align: middle; text-align: left; user-select: none; -webkit-touch-callout: none;}
+        .selectAnylysis .placeholder { position: relative; display: block; background-color: #393d41; z-index: 1; padding: 1em; border-radius: 2px; cursor: pointer;}
+        .selectAnylysis .placeholder:hover { background: #34383c;}
+        .selectAnylysis .placeholder:after { position: absolute; right: 1em; top: 50%; transform: translateY(-50%); font-family: 'FontAwesome'; content: '\f078'; z-index: 10;}
+        .selectAnylysis.is-open .placeholder:after { content: '\f077';}
+        .selectAnylysis.is-open ul { display: block;}
+        .selectAnylysis.selectAnylysis--white .placeholder { background: #fff; color: #999;}
+        .selectAnylysis.selectAnylysis--white .placeholder:hover { background: #fafafa;}
+        .selectAnylysis.selectAnylysis--green .placeholder { background: #5BF36E; color: #FFF;}
+        .selectAnylysis.selectAnylysis--green .placeholder:hover { background: #5BF36E;}
+        .selectAnylysis ul { display: none; position: absolute; overflow: hidden; width: 100%; background: #fff; border-radius: 2px; top: 100%; left: 0; list-style: none; margin: 5px 0 0 0; padding: 0; z-index: 100;}
+        .selectAnylysis ul li { display: block; text-align: left; padding: 0.8em 1em 0.8em 1em; color: #999; cursor: pointer;}
+        .selectAnylysis ul li:hover { background: #4ebbf0; color: #fff;}
+    </style>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.3/esri/themes/dark/main.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/4.3/dijit/themes/tundra/tundra.css">
+    <script src="https://js.arcgis.com/4.3/"></script>
+
+    <script>
+      require([
+          "esri/Map",
+          "esri/views/MapView",
+          "esri/tasks/Geoprocessor",
+          "esri/widgets/Legend",
+          "esri/widgets/Spinner",
+          "esri/layers/support/ImageParameters",
+
+          "dijit/form/DateTextBox",
+          "dojo/dom",
+          "dojo/dom-construct",
+          "dojo/on",
+          "dojo/date/locale",
+          "dojo/parser",
+          "dijit/registry",
+          "dojo/domReady!"
+        ],
+        function(Map, MapView, Geoprocessor, Legend, Spinner, ImageParameters,
+                 DateTextBox, dom, domConstruct, on, locale, parser, registry) {
+
+          parser.parse();
+
+          on(dom.byId("hotspotButton"), "click", findHotspot);
+
+          var map = new Map({
+            basemap: "dark-gray-vector"
+          });
+
+          var view = new MapView({
+            container: "viewDiv",
+            map: map,
+            center: [121, 31],
+            zoom: 12
+          });
+
+          // initialize geoprocessor task
+          var gpUrl =
+
+            "http://10.60.42.201:6447/arcgis/rest/services/热点分析/GPServer/WPSServer";
+
+          var gp = new Geoprocessor(gpUrl);
+          gp.outSpatialReference = { // autocasts as new SpatialReference()
+            wkid: 102100
+          };
+
+          // initialize a legend widget for the geoprocessing service result
+          var legend = new Legend({
+            view: view
+          }, "legendDiv");
+
+          // create and show spinner while the geoprocessing service is
+          // running
+          spinner = new Spinner({
+            visible: true,
+            viewModel: {
+              view: view
+            }
+          });
+          domConstruct.place(spinner.domNode, view.root);
+
+          function findHotspot() {
+            var params = {
+              Query: buildDefinitionQuery()
+            };
+
+            // clean up previous results
+            cleanup();
+
+            spinner.viewModel.point = view.center;
+            gp.submitJob(params).then(drawResultData, errBack, progTest);
+          }
+
+          function buildDefinitionQuery() {
+            console.log(document.getElementById('featcode').value)
+            var defQuery = "(FEATCODE = " + parseInt(document.getElementById('featcode').value, 10) + ")";
+            return defQuery;
+          }
+
+          function cleanup() {
+            // remove the geoprocessing result layer from the map
+            map.layers.forEach(function(layer, i) {
+              if (layer.title === "HotspotLayer") {
+                map.layers.remove(layer);
+              }
+            });
+          }
+
+          function drawResultData(result) {
+            // set imageParameters
+            var imageParams = new ImageParameters({
+              format: "png32",
+              dpi: 300
+            });
+
+            // get the task result as a MapImageLayer
+            var resultLayer = gp.getResultMapImageLayer(result.jobId, null, imageParams);
+            resultLayer.opacity = 0.7;
+            resultLayer.title = "HotspotLayer";
+
+            // add the result layer to the map
+            map.layers.add(resultLayer);
+
+            // hide the spinner
+            spinner.viewModel.point = null;
+          }
+
+          function progTest(value) {
+            console.log(value.jobStatus);
+          }
+
+          function errBack(err) {
+            console.log("gp error: ", err);
+          }
+        });
+    </script>
+</head>
+
+<body class="tundra">
+
+<div class="selectAnylysis" style="margin:0">
+
+    <span class="placeholder">底图选择</span>
+    <ul>
+        <li value="oceans">oceans</li>
+        <li value="gray">gray</li>
+        <li value="national-geographic">national-geographic</li>
+        <li value="hybrid">hybrid</li>
+        <li value="osm">osm</li>
+        <li value="satellite">satellite</li>
+        <li value="streets">streets</li>
+        <li value="topo">topo</li>
+    </ul>
+</div>
+<div id="viewDiv">
+    <div id="sidebar">
+        <div id="text">
+            <div id="info">
+
+                <div align="center">
+                    <input type="text" placeholder="..." id="featcode">
+                    <br> <button id="hotspotButton">Search</button>
+                </div>
+
+                <div id="legendDiv"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

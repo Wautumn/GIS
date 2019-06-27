@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello World</title>
+    <link rel="stylesheet" type="text/css" href="public/stylesheets/tundra.css"/>
+    <link rel="stylesheet" href="public/stylesheets/main.css">
+    <script type="text/javascript" src="public/javascripts/init.js"></script>
+    <script>
+        require(["esri/map","dojo/domReady!"],
+            function(Map){
+                var map = new Map("mapDiv",{
+                    basemap:"topo"
+                });
+                //利用url创建一个动态地图服务对象
+                // var layer=new ArcGISDynamicMapServiceLayer("https://localhost:6443/arcgis/rest/services/SampleWorldCities/MapServer");
+                // //将地图服务对象添加到地图容器中
+                // map.addLayer(layer);
+
+
+            })
+    </script>
+</head>
+<body class="tundra">
+cdcsd
+<div id="mapDiv" style="width:900px; height:600px; border:1px solid #000;"></div>
+</body>
+
+</html>
+
+</html>

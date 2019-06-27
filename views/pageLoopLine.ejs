@@ -1,0 +1,267 @@
+<div class="pageLoopLine container active">
+    <h2>环线文化产业分布图</h2>
+    <span>基于上海市对于环线的定义及环线围绕的道路的组成，我们知道上海的三环由外到内分别是外环线S20，中环线和内环高架路，也即将上海分成四个同心类圆环区域，具体划分如下：</span>
+    <span>“上海内环线”，官方称呼“上海内环高架路”，是上海市最早建设的城市快速高架道路，它的浦西部分主要沿“中山南路→中山南一路→中山南二路→中山西路→中山北路→中山北一路→中山北二路→黄兴路”修建高架道路。浦东部分为“罗山路→龙阳路”的地面快速道路。</span><span>上海中环路，又称上海中环线，是上海的一条封闭式环形快速机动车专用路，位于内环高架路和S20外环高速之间的一条城市快速路。</span>
+    <span>外环线位于上海城乡结合部，环内城区面积680平方公里。它连接10条快速干道、10座大型全互通立交和徐浦大桥、外环隧道2座越江工程。</span>
+
+    <div class="selectLoopLine" style="margin:0">
+
+        <span class="placeholder">底图选择</span>
+        <ul>
+            <li value="oceans">oceans</li>
+            <li value="gray">gray</li>
+            <li value="national-geographic">national-geographic</li>
+            <li value="hybrid">hybrid</li>
+            <li value="osm">osm</li>
+            <li value="satellite">satellite</li>
+            <li value="streets">streets</li>
+            <li value="topo">topo</li>
+        </ul>
+    </div>
+    <div id="viewDivLoopLine"></div>
+    <span>内环共有21794家上海文化产业，占上海文化产业比例为39.6075%，中环共有11417家上海文化产业，占上海文化产业比例为20.7488%，内环共有7211家上海文化产业，占上海文化产业比例为13.1050%。</span>
+    <span>从结果来看内环内的文化创意产业数量最高，并且越是远离市中心的中环、外环文化创意产业越少。这也与实际情况相符合，越是靠近市中心，各类企业的发展和分布越密集，相应文化产业这一类的企业也会随之呈现增多的趋势，同时人口密集程度和教育文化资源的集中程度也是造成这种差异的潜在因素。</span>
+    <div id="mainDivLoopLine" style="width: 100%;height:500px;"></div>
+</div>
+<script>
+    var basemap = "";
+    $('.selectLoopLine').on('click', '.placeholder', function(e) {
+        var parent = $(this).closest('.selectLoopLine');
+        if (!parent.hasClass('is-open')) {
+            parent.addClass('is-open');
+            $('.selectLoopLine.is-open').not(parent).removeClass('is-open');
+        } else {
+            parent.removeClass('is-open');
+        }
+        e.stopPropagation();
+    }).on('click', 'ul>li', function() {
+        var parent = $(this).closest('.selectLoopLine');
+        parent.removeClass('is-open').find('.placeholder').text($(this).text());
+        basemap = this.attributes[0].value;
+        require([
+            "esri/Map",
+            "esri/views/SceneView",
+            "esri/layers/FeatureLayer",
+            "dojo/domReady!"
+        ], function(Map, SceneView, FeatureLayer){
+            var template = {
+                title: "文化产业区域信息：",
+                content: "<p>{Name}</p>" + "一共有{Join_Count}个文化产业",
+                fieldInfos: [{
+                    fieldName: "MARRIED_CY",
+                    format: {
+                        digitSeparator: true, // Use a comma separator for large numbers
+                        places: 0 // Sets the number of decimal places to 0 and rounds up
+                    }
+                }, {
+                    fieldName: "NEVMARR_CY",
+                    format: {
+                        digitSeparator: true,
+                        places: 0
+                    }
+                }, {
+                    fieldName: "DIVORCD_CY",
+                    format: {
+                        digitSeparator: true,
+                        places: 0
+                    }
+                }]
+            };
+
+            // Create the Map
+            var map = new Map({
+                basemap: basemap,
+                ground: "world-elevation",
+                logo:false
+            });
+
+            // Create the MapView
+            var view = new SceneView({
+                container: "viewDivLoopLine",
+                map: map,
+                zoom: 12,  // Sets the zoom level based on level of detail (LOD)
+                center: [121, 31]  // Sets the center point of view in lon/lat
+            });
+
+            var featureLayer = new FeatureLayer({
+                url: "http://10.60.42.201:6447/arcgis/rest/services/环线文化产业分布图/MapServer/1",
+                outFields: ["*"],
+                popupTemplate: template
+            });
+
+            view.then(function() {
+                featureLayer.then(function() {
+                    view.goTo(featureLayer.fullExtent);
+                });
+            });
+            map.add(featureLayer)
+
+        });
+    })
+    var LoopLineMap = echarts.init(document.getElementById('mainDivLoopLine'));
+
+    // 指定图表的配置项和数据
+    option = {
+        title : {
+            text: '环线文化产业',
+            subtext: '上海市',
+            x:'center'
+        },
+        tooltip : {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        legend: {
+            y:'bottom',
+            data: ['内环','中环','外环']
+        },
+        series : [
+            {
+                name: '文化产业数',
+                type: 'pie',
+                radius : '55%',
+                center: ['50%', '60%'],
+                data:[
+                    {value:21794, name:'内环'},
+                    {value:11417, name:'中环'},
+                    {value:7211, name:'外环'}
+                ],
+                itemStyle: {
+                    emphasis: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+
+
+    LoopLineMap.setOption(option);
+
+    require([
+        "esri/Map",
+        "esri/views/SceneView",
+        "esri/layers/FeatureLayer",
+        "dojo/domReady!"
+    ], function(Map, SceneView, FeatureLayer){
+        var template = {
+            title: "文化产业区域信息：",
+            content: "<p>{Name}</p>" + "一共有{Join_Count}个文化产业",
+            fieldInfos: [{
+                fieldName: "MARRIED_CY",
+                format: {
+                    digitSeparator: true, // Use a comma separator for large numbers
+                    places: 0 // Sets the number of decimal places to 0 and rounds up
+                }
+            }, {
+                fieldName: "NEVMARR_CY",
+                format: {
+                    digitSeparator: true,
+                    places: 0
+                }
+            }, {
+                fieldName: "DIVORCD_CY",
+                format: {
+                    digitSeparator: true,
+                    places: 0
+                }
+            }]
+        };
+
+        // Create the Map
+        var map = new Map({
+            basemap: "oceans",
+            ground: "world-elevation",
+            logo:false
+        });
+
+        // Create the MapView
+        var view = new SceneView({
+            container: "viewDivLoopLine",
+            map: map,
+            zoom: 12,  // Sets the zoom level based on level of detail (LOD)
+            center: [121, 31]  // Sets the center point of view in lon/lat
+        });
+
+        var featureLayer = new FeatureLayer({
+            url: "http://10.60.42.201:6447/arcgis/rest/services/环线文化产业分布图/MapServer/1",
+            outFields: ["*"],
+            popupTemplate: template
+        });
+
+
+
+        view.then(function() {
+            featureLayer.then(function() {
+                view.goTo(featureLayer.fullExtent);
+            });
+        });
+
+
+        map.add(featureLayer)
+
+    });
+
+</script>
+
+
+<style>
+    #viewDivLoopLine{
+        padding: 0;
+        margin: 40px 10px;
+        height: 40%;
+        width: 100%;
+        max-width: calc(100% - 202px);
+
+    }
+
+    #viewDivLoopLine.active {
+        display: none;
+    }
+
+    .pageLoopLine.container {
+        display: flex;
+        display: -webkit-flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    .pageLoopLine.container > div {
+        margin: 20px;
+    }
+
+    .pageLoopLine.container > h2 {
+        align-self: flex-start;
+        color: #0088f5;
+        font-size: 5em;
+        margin: 20px;
+        text-indent:30px;
+    }
+    .pageLoopLine.container > span{
+        font-size: 2em;
+        width:100rem;
+        text-indent: 30px;
+        letter-spacing: 1px;
+        line-height: 2;
+    }
+    .pageLoopLine.container.active {
+        display: none;
+    }
+    .selectLoopLine { position: relative; display: block; margin: 0 auto; width: 10%; max-width: 325px; color: #cccccc; vertical-align: middle; text-align: left; user-select: none; -webkit-touch-callout: none;}
+    .selectLoopLine .placeholder { position: relative; display: block; background-color: #393d41; z-index: 1; padding: 1em; border-radius: 2px; cursor: pointer;}
+    .selectLoopLine .placeholder:hover { background: #34383c;}
+    .selectLoopLine .placeholder:after { position: absolute; right: 1em; top: 50%; transform: translateY(-50%); font-family: 'FontAwesome'; content: '\f078'; z-index: 10;}
+    .selectLoopLine.is-open .placeholder:after { content: '\f077';}
+    .selectLoopLine.is-open ul { display: block;}
+    .selectLoopLine.selectLoopLine--white .placeholder { background: #fff; color: #999;}
+    .selectLoopLine.selectLoopLine--white .placeholder:hover { background: #fafafa;}
+    .selectLoopLine.selectLoopLine--green .placeholder { background: #5BF36E; color: #FFF;}
+    .selectLoopLine.selectLoopLine--green .placeholder:hover { background: #5BF36E;}
+    .selectLoopLine ul { display: none; position: absolute; overflow: hidden; width: 100%; background: #fff; border-radius: 2px; top: 100%; left: 0; list-style: none; margin: 5px 0 0 0; padding: 0; z-index: 100;}
+    .selectLoopLine ul li { display: block; text-align: left; padding: 0.8em 1em 0.8em 1em; color: #999; cursor: pointer;}
+    .selectLoopLine ul li:hover { background: #4ebbf0; color: #fff;}
+</style>

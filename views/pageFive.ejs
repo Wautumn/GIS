@@ -1,0 +1,475 @@
+<div class="pageFive container active">
+    <h2>文化产业重新规划</h2>
+    <div class="map-container active" id="5-1">
+        <div class="selectFive" style="margin:0">
+            <span class="placeholder">底图选择</span>
+            <ul>
+                <li value="oceans">oceans</li>
+                <li value="gray">gray</li>
+                <li value="national-geographic">national-geographic</li>
+                <li value="hybrid">hybrid</li>
+                <li value="osm">osm</li>
+                <li value="satellite">satellite</li>
+                <li value="streets">streets</li>
+                <li value="topo">topo</li>
+            </ul>
+        </div>
+        <div id="viewDiv5-1"></div>
+        <a href="/arc" target="_blank">查看大图</a>
+    </div>
+    <div class="map-container active" id="5-2">
+        <div class="selectFive" style="margin:0">
+            <span class="placeholder">底图选择</span>
+            <ul>
+                <li value="oceans">oceans</li>
+                <li value="gray">gray</li>
+                <li value="national-geographic">national-geographic</li>
+                <li value="hybrid">hybrid</li>
+                <li value="osm">osm</li>
+                <li value="satellite">satellite</li>
+                <li value="streets">streets</li>
+                <li value="topo">topo</li>
+            </ul>
+        </div>
+        <div id="viewDiv5-2"></div>
+        <select id="area_select">
+            <option value="0">宝山区</option>
+            <option value="1">长宁区</option>
+            <option value="2">奉贤区</option>
+            <option value="3">虹口区</option>
+            <option value="4">黄浦区</option>
+            <option value="5">嘉定区</option>
+            <option value="6">静安区</option>
+            <option value="7">金山区</option>
+            <option value="8">闵行区</option>
+            <option value="9">浦东新区</option>
+            <option value="10">普陀区</option>
+            <option value="11">松江区</option>
+            <option value="12">徐汇区</option>
+            <option value="13">杨浦区</option>
+        </select>
+    </div>
+</div>
+<script>
+    var basemap = "";
+    $('.selectFive').on('click', '.placeholder', function(e) {
+        var parent = $(this).closest('.selectFive');
+        if (!parent.hasClass('is-open')) {
+            parent.addClass('is-open');
+            $('.selectFive.is-open').not(parent).removeClass('is-open');
+        } else {
+            parent.removeClass('is-open');
+        }
+        e.stopPropagation();
+    }).on('click', 'ul>li', function() {
+        var parent = $(this).closest('.selectFive');
+        parent.removeClass('is-open').find('.placeholder').text($(this).text());
+        basemap = this.attributes[0].value;
+        require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/layers/FeatureLayer",
+            "esri/renderers/smartMapping/creators/size",
+            "esri/renderers/smartMapping/statistics/histogram",
+            "esri/widgets/SizeSlider",
+            "esri/widgets/Legend",
+            "esri/core/lang",
+            "dojo/on",
+            "dojo/domReady!"
+        ], function(
+            Map, MapView, FeatureLayer, sizeRendererCreator, histogram,
+            SizeSlider, Legend, lang, on
+        ) {
+
+            // Create a map and add it to a MapView
+
+            var map = new Map({
+                basemap: basemap
+            });
+
+            var view = new MapView({
+                container: "viewDiv5-1",
+                map: map,
+                center: [121, 31],
+                zoom: 8
+            });
+
+            var map2 = new Map({
+                basemap: basemap
+            });
+
+            var view2 = new MapView({
+                container: "viewDiv5-2",
+                map: map2,
+                center: [121, 31],
+                zoom: 8
+            });
+
+
+            map_urls = ["baoshanService", "changningService", "fengxianService", "hongkouService", "huangpuService", "jiadingService", "jinganService",
+                "jinshanService", "minghangService", "pudongService", "putuoService", "songjiangService", "xuhuiService", "yangpuService"];
+            feature_layers = [];
+            for (let i = 0, length = map_urls.length; i < length; i++) {
+                let tmpLayer = new FeatureLayer({
+                    url: "http://10.60.42.201:6447/arcgis/rest/services/"+map_urls[i]+"/MapServer/0",
+                    visible:false
+                });
+                feature_layers.push(tmpLayer);
+                map2.add(tmpLayer);
+
+            }
+            let last = 0;
+            feature_layers[0].visible =true;
+            $("#area_select").change(function() {
+                feature_layers[last].visible =false;
+                last = parseInt($(this).val());
+                feature_layers[last].visible =true
+            })
+
+            var povLyr = new FeatureLayer({
+                url: "http://10.60.42.201:6447/arcgis/rest/services/NeighbourService/MapServer/0",
+                outFields: ["*"],
+                popupTemplate: {
+                    title: "{type}区 {name}",
+                    content: "{name} 的房价为 {price}."
+                }
+            });
+
+            // configure parameters for the size renderer generator
+            // the layer must be specified along with a field name.
+            // The basemap and then determine
+            // the appropriate default size scheme.
+
+            var sizeParams = {
+                layer: povLyr,
+                basemap: map.basemap,
+                field: "price",
+                normalizationField: "avg_price",
+                legendOptions: {
+                    title: "Ratio of people living in poverty"
+                },
+                minValue: 0.15
+            };
+
+            // Initialize the object containing size slider properties.
+            var sliderParams = {
+                container: "slider"
+            };
+
+            // Generate a continuous size renderer based on the
+            // statistics of the data in the provided layer
+            // and field.
+            //
+            // This resolves to an object containing several helpful
+            // properties, including size scheme, statistics,
+            // the renderer, and visual variable
+
+            sizeRendererCreator.createContinuousRenderer(sizeParams)
+                .then(function(response) {
+
+                    // set generated renderer on the layer and add it to the map
+
+                    povLyr.renderer = response.renderer;
+                    map.add(povLyr);
+
+                    // set the queried statistics and generated visual variable
+                    // to the slider parameters
+
+                    sliderParams.statistics = response.statistics;
+                    sliderParams.visualVariable = lang.clone(response.visualVariables[
+                        0]);
+
+                    // Create a legend and add it to the view's UI
+
+                    var legend = new Legend({
+                        view: view,
+                        layerInfos: [
+                            {
+                                layer: povLyr,
+                                title: "Poverty in the southeast U.S."
+                            }]
+                    });
+                    view.ui.add(legend, "bottom-right");
+
+                    // generate a histogram for use in the slider. Input the layer
+                    // and field name to generate it.
+
+                    return histogram({
+                        layer: povLyr,
+                        field: sizeParams.field,
+                        normalizationField: sizeParams.normalizationField,
+                        minValue: sizeParams.minValue
+                    });
+
+                })
+                .then(function(histogram) {
+
+                    // when the promise resolves, set the histogram in the slider parameters
+
+                    sliderParams.histogram = histogram;
+
+                    // input the slider parameters in the slider's constructor
+                    // and add it to the view's UI
+
+                    sizeSlider = new SizeSlider(sliderParams);
+                    view.ui.add("containerDiv", "bottom-left");
+
+                    // when the user slides the handle(s), update the renderer
+                    // with the updated color visual variable object
+                    on(sizeSlider, "handle-value-change", function() {
+                        var renderer = povLyr.renderer.clone();
+                        renderer.visualVariables = [lang.clone(sizeSlider.visualVariable)];
+                        povLyr.renderer = renderer;
+                    });
+                })
+                .otherwise(function(err) {
+                    console.log("there was an error: ", err);
+                });
+        });
+
+    })
+  require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/FeatureLayer",
+      "esri/renderers/smartMapping/creators/size",
+      "esri/renderers/smartMapping/statistics/histogram",
+      "esri/widgets/SizeSlider",
+      "esri/widgets/Legend",
+      "esri/core/lang",
+      "dojo/on",
+      "dojo/domReady!"
+    ], function(
+      Map, MapView, FeatureLayer, sizeRendererCreator, histogram,
+      SizeSlider, Legend, lang, on
+    ) {
+
+      // Create a map and add it to a MapView
+
+      var map = new Map({
+        basemap: "gray"
+      });
+
+      var view = new MapView({
+        container: "viewDiv5-1",
+        map: map,
+        center: [121, 31],
+        zoom: 8
+      });
+
+      var map2 = new Map({
+        basemap: "gray"
+      });
+
+      var view2 = new MapView({
+        container: "viewDiv5-2",
+        map: map2,
+        center: [121, 31],
+        zoom: 8
+      });
+
+
+        map_urls = ["baoshanService", "changningService", "fengxianService", "hongkouService", "huangpuService", "jiadingService", "jinganService",
+        "jinshanService", "minghangService", "pudongService", "putuoService", "songjiangService", "xuhuiService", "yangpuService"];
+        feature_layers = [];
+        for (let i = 0, length = map_urls.length; i < length; i++) {
+            let tmpLayer = new FeatureLayer({
+                url: "http://10.60.42.201:6447/arcgis/rest/services/"+map_urls[i]+"/MapServer/0",
+                visible:false
+            });
+            feature_layers.push(tmpLayer);
+            map2.add(tmpLayer);
+
+        }
+        let last = 0;
+        feature_layers[0].visible =true;
+        $("#area_select").change(function() {
+            feature_layers[last].visible =false;
+            last = parseInt($(this).val());
+            feature_layers[last].visible =true
+        })
+
+        var povLyr = new FeatureLayer({
+
+            url: "http://10.60.42.201:6447/arcgis/rest/services/环同济经济圈寻址模型/MapServer/0",
+
+            outFields: ["*"],
+            popupTemplate: {
+            //title: "{type}区 {name}",
+            content: "该地区Z值为 {Z_value}."
+        }
+    });
+
+      // configure parameters for the size renderer generator
+      // the layer must be specified along with a field name.
+      // The basemap and then determine
+      // the appropriate default size scheme.
+
+      var sizeParams = {
+        layer: povLyr,
+        basemap: map.basemap,
+        field: "z_value",
+        //normalizationField: "avg_price",
+        legendOptions: {
+          title: "Ratio of people living in poverty"
+        },
+        minValue: 0.15
+      };
+
+      // Initialize the object containing size slider properties.
+      var sliderParams = {
+        container: "slider"
+      };
+
+      // Generate a continuous size renderer based on the
+      // statistics of the data in the provided layer
+      // and field.
+      //
+      // This resolves to an object containing several helpful
+      // properties, including size scheme, statistics,
+      // the renderer, and visual variable
+
+      sizeRendererCreator.createContinuousRenderer(sizeParams)
+        .then(function(response) {
+
+          // set generated renderer on the layer and add it to the map
+
+          povLyr.renderer = response.renderer;
+          map.add(povLyr);
+
+          // set the queried statistics and generated visual variable
+          // to the slider parameters
+
+          sliderParams.statistics = response.statistics;
+          sliderParams.visualVariable = lang.clone(response.visualVariables[
+            0]);
+
+          // Create a legend and add it to the view's UI
+
+          var legend = new Legend({
+            view: view,
+            layerInfos: [
+            {
+              layer: povLyr,
+              title: "Poverty in the southeast U.S."
+            }]
+          });
+          view.ui.add(legend, "bottom-right");
+
+          // generate a histogram for use in the slider. Input the layer
+          // and field name to generate it.
+
+          return histogram({
+            layer: povLyr,
+            field: sizeParams.field,
+            normalizationField: sizeParams.normalizationField,
+            minValue: sizeParams.minValue
+          });
+
+        })
+        .then(function(histogram) {
+
+          // when the promise resolves, set the histogram in the slider parameters
+
+          sliderParams.histogram = histogram;
+
+          // input the slider parameters in the slider's constructor
+          // and add it to the view's UI
+
+          sizeSlider = new SizeSlider(sliderParams);
+          view.ui.add("containerDiv", "bottom-left");
+
+          // when the user slides the handle(s), update the renderer
+          // with the updated color visual variable object
+          on(sizeSlider, "handle-value-change", function() {
+            var renderer = povLyr.renderer.clone();
+            renderer.visualVariables = [lang.clone(sizeSlider.visualVariable)];
+            povLyr.renderer = renderer;
+          });
+        })
+        .otherwise(function(err) {
+          console.log("there was an error: ", err);
+        });
+    });
+
+</script>
+
+
+<style>
+    .pageFive.container {
+        display: flex;
+        display: -webkit-flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    .pageFive.container > div {
+        margin: 20px;
+    }
+
+    .pageFive.container > h2 {
+        align-self: flex-start;
+        color: #0088f5;
+        font-size: 5em;
+        margin: 20px;
+        text-indent:30px;
+    }
+
+    .pageFive.container.active {
+        display: none;
+    }
+
+    .map-container {
+        padding: 0;
+        margin: 10px;
+        width: 100%;
+        height: 700px;
+        max-width: calc(100% - 202px);
+    }
+
+    .map-container.active {
+        display: none;
+    }
+
+    #viewDiv5-1 {
+        height: 100%;
+        width: 100%;
+    }
+
+    #viewDiv5-1.active {
+        display: none;
+    }
+
+    #viewDiv5-2 {
+        height: 100%;
+        width: 100%;
+    }
+
+    #viewDiv5-2.active {
+        display: none;
+    }
+
+    #area_select {
+        position: relative;
+        top: -90px;
+        right: -700px;
+        border-top: solid 1px rgba(50,50,50,0.25);
+        height: 35px;
+        cursor: pointer;
+    }
+    .selectFive { position: relative; display: block; margin: 0 auto; width: 10%; max-width: 325px; color: #cccccc; vertical-align: middle; text-align: left; user-select: none; -webkit-touch-callout: none;}
+    .selectFive .placeholder { position: relative; display: block; background-color: #393d41; z-index: 1; padding: 1em; border-radius: 2px; cursor: pointer;}
+    .selectFive .placeholder:hover { background: #34383c;}
+    .selectFive .placeholder:after { position: absolute; right: 1em; top: 50%; transform: translateY(-50%); font-family: 'FontAwesome'; content: '\f078'; z-index: 10;}
+    .selectFive.is-open .placeholder:after { content: '\f077';}
+    .selectFive.is-open ul { display: block;}
+    .selectFive.selectFive--white .placeholder { background: #fff; color: #999;}
+    .selectFive.selectFive--white .placeholder:hover { background: #fafafa;}
+    .selectFive.selectFive--green .placeholder { background: #5BF36E; color: #FFF;}
+    .selectFive.selectFive--green .placeholder:hover { background: #5BF36E;}
+    .selectFive ul { display: none; position: absolute; overflow: hidden; width: 100%; background: #fff; border-radius: 2px; top: 100%; left: 0; list-style: none; margin: 5px 0 0 0; padding: 0; z-index: 100;}
+    .selectFive ul li { display: block; text-align: left; padding: 0.8em 1em 0.8em 1em; color: #999; cursor: pointer;}
+    .selectFive ul li:hover { background: #4ebbf0; color: #fff;}
+</style>

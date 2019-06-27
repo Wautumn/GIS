@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>房价分布图</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.3/esri/css/main.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/4.3/dijit/themes/claro/claro.css">
+    <script src="https://js.arcgis.com/4.3/"></script>
+
+</head>
+
+<style>
+    html,
+    body,
+    #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+    }
+
+    #containerDiv {
+        background-color: white;
+        padding: 3px;
+        text-align: center;
+    }
+
+    #title {
+        font-size: 14pt;
+        font-weight: 500;
+    }
+    .selecttest { position: relative; display: block; margin: 0 auto; width: 10%; max-width: 325px; color: #cccccc; vertical-align: middle; text-align: left; user-select: none; -webkit-touch-callout: none;}
+    .selecttest .placeholder { position: relative; display: block; background-color: #393d41; z-index: 1; padding: 1em; border-radius: 2px; cursor: pointer;}
+    .selecttest .placeholder:hover { background: #34383c;}
+    .selecttest .placeholder:after { position: absolute; right: 1em; top: 50%; transform: translateY(-50%); font-family: 'FontAwesome'; content: '\f078'; z-index: 10;}
+    .selecttest.is-open .placeholder:after { content: '\f077';}
+    .selecttest.is-open ul { display: block;}
+    .selecttest.selecttest--white .placeholder { background: #fff; color: #999;}
+    .selecttest.selecttest--white .placeholder:hover { background: #fafafa;}
+    .selecttest.selecttest--green .placeholder { background: #5BF36E; color: #FFF;}
+    .selecttest.selecttest--green .placeholder:hover { background: #5BF36E;}
+    .selecttest ul { display: none; position: absolute; overflow: hidden; width: 100%; background: #fff; border-radius: 2px; top: 100%; left: 0; list-style: none; margin: 5px 0 0 0; padding: 0; z-index: 100;}
+    .selecttest ul li { display: block; text-align: left; padding: 0.8em 1em 0.8em 1em; color: #999; cursor: pointer;}
+    .selecttest ul li:hover { background: #4ebbf0; color: #fff;}
+</style>
+
+
+</head>
+
+<body class="claro">
+
+<div class="selecttest" style="margin:0">
+
+    <span class="placeholder">底图选择</span>
+    <ul>
+        <li value="oceans">oceans</li>
+        <li value="gray">gray</li>
+        <li value="national-geographic">national-geographic</li>
+        <li value="hybrid">hybrid</li>
+        <li value="osm">osm</li>
+        <li value="satellite">satellite</li>
+        <li value="streets">streets</li>
+        <li value="topo">topo</li>
+    </ul>
+</div>
+<div id="viewDiv"></div>
+<div id="containerDiv"><span id="title">Price</span>
+    <div id="slider"></div>
+</div>
+</body>
+<script>
+    var basemap = "";
+    $('.selecttest').on('click', '.placeholder', function(e) {
+        var parent = $(this).closest('.selecttest');
+        if (!parent.hasClass('is-open')) {
+            parent.addClass('is-open');
+            $('.selecttest.is-open').not(parent).removeClass('is-open');
+        } else {
+            parent.removeClass('is-open');
+        }
+        e.stopPropagation();
+    }).on('click', 'ul>li', function() {
+        var parent = $(this).closest('.selecttest');
+        parent.removeClass('is-open').find('.placeholder').text($(this).text());
+        basemap = this.attributes[0].value;
+        require([
+            "esri/Map",
+            "esri/views/SceneView",
+            "esri/layers/FeatureLayer",
+            "esri/renderers/smartMapping/creators/univariateColorSize",
+            "esri/renderers/smartMapping/statistics/histogram",
+            "esri/widgets/UnivariateColorSizeSlider",
+            "esri/core/lang",
+            "dojo/on",
+            "dojo/domReady!"
+        ], function(
+            Map, SceneView, FeatureLayer, colorAndSizeRendererCreator, histogram,
+            UnivariateColorSizeSlider, lang, on
+        ) {
+
+            var map = new Map({
+                basemap: basemap
+            });
+
+            // The minSize and maxSize of volumetric symbols are determined
+            // based on the view/camera the data will be displayed in.
+
+            var view = new SceneView({
+                container: "viewDiv",
+                map: map,
+                camera: {
+                    tilt: 52.09457445834279,
+                    heading: 355.8,
+                    position: {
+                        latitude: 20,
+                        longitude: 122,
+                        z: 922291,
+                        spatialReference: {
+                            wkid: 3857
+                        }
+                    }
+                }
+            });
+
+            // Create FeatureLayer instance with popupTemplate
+
+            var povLyr = new FeatureLayer({
+                url: "http://10.60.42.201:6447/arcgis/rest/services/NeighbourService/MapServer",
+                outFields: ["*"],
+                popupTemplate: {
+                    title: "{name}",
+                    content: "price: {price}",
+                    fieldInfos: [{
+                        fieldName: "price",
+                        format: {
+                            digitSeparator: true,
+                            places: 0
+                        }
+                    }]
+                }
+            });
+
+            // configure parameters for the renderer generator.
+            // the layer must be specified along with a field name
+            // or arcade expression. The basemap and other properties determine
+            // the appropriate default color and size schemes.
+
+            var params = {
+                layer: povLyr,
+                basemap: map.basemap,
+                field: "price",
+                view: view,
+                symbolType: "3d-volumetric",
+                minValue: 0
+            };
+
+            // Initialize the object containing slider properties.
+            var sliderParams = {
+                container: "slider"
+            };
+
+//    view.then(function() {
+//      view.goto({
+//        center:[121, 31],
+//        zoom: 6,
+//        heading: 30,
+//        tilt: 60
+//      })
+//    });
+
+            // Generate a renderer visualizing a single variable
+            // with continuous color and size based on the
+            // statistics of the data in the provided layer
+            // and field name.
+            //
+            // This resolves to an object containing several helpful
+            // properties, including size/color schemes, statistics,
+            // the renderer, and visual variables
+
+            colorAndSizeRendererCreator.createContinuousRenderer(params)
+                .then(function(response) {
+
+                    // set generated renderer on the layer and add it to the map
+
+                    povLyr.renderer = response.renderer;
+                    map.add(povLyr);
+
+                    // set the queried statistics and generated visual variable
+                    // to the slider parameters
+
+                    var sizeVVs = lang.clone(response.size.visualVariables);
+                    var colorVV = lang.clone(response.color.visualVariable);
+
+                    var sliderVisualVariables = sizeVVs;
+                    sliderVisualVariables.push(colorVV);
+
+                    sliderParams.statistics = response.statistics;
+                    sliderParams.visualVariables = sliderVisualVariables;
+
+                    // generate a histogram for use in the slider. Input the layer
+                    // and field name to generate it.
+                    // You can also use an arcade expression instead of
+                    // a field and normalization field
+
+                    return histogram({
+                        layer: povLyr,
+                        field: params.field
+                    });
+                })
+                .then(function(histogram) {
+
+                    // when the promise resolves, set the histogram in the slider parameters
+                    sliderParams.histogram = histogram;
+
+                    // input the slider parameters in the slider's constructor
+                    // and add it to the view's UI
+
+                    var slider = new UnivariateColorSizeSlider(sliderParams);
+                    view.ui.add("containerDiv", "bottom-left");
+
+                    // when the user slides the handle(s), update the renderer
+                    // with the updated color and size visual variable objects
+
+                    on(slider, "data-change", function() {
+                        var renderer = povLyr.renderer.clone();
+                        renderer.visualVariables = lang.clone(slider.visualVariables);
+                        povLyr.renderer = renderer;
+                    });
+
+                })
+                .otherwise(function(err) {
+                    console.log("there was an error: ", err);
+                });
+
+        });
+    })
+  require([
+    "esri/Map",
+    "esri/views/SceneView",
+    "esri/layers/FeatureLayer",
+    "esri/renderers/smartMapping/creators/univariateColorSize",
+    "esri/renderers/smartMapping/statistics/histogram",
+    "esri/widgets/UnivariateColorSizeSlider",
+    "esri/core/lang",
+    "dojo/on",
+    "dojo/domReady!"
+  ], function(
+    Map, SceneView, FeatureLayer, colorAndSizeRendererCreator, histogram,
+    UnivariateColorSizeSlider, lang, on
+  ) {
+
+    var map = new Map({
+      basemap: "topo"
+    });
+
+    // The minSize and maxSize of volumetric symbols are determined
+    // based on the view/camera the data will be displayed in.
+
+    var view = new SceneView({
+      container: "viewDiv",
+      map: map,
+      camera: {
+        tilt: 52.09457445834279,
+        heading: 355.8,
+        position: {
+          latitude: 20,
+          longitude: 122,
+          z: 922291,
+          spatialReference: {
+            wkid: 3857
+          }
+        }
+      }
+    });
+
+    // Create FeatureLayer instance with popupTemplate
+
+    var povLyr = new FeatureLayer({
+      url: "http://10.60.42.201:6447/arcgis/rest/services/NeighbourService/MapServer",
+      outFields: ["*"],
+      popupTemplate: {
+        title: "{name}",
+        content: "price: {price}",
+        fieldInfos: [{
+          fieldName: "price",
+          format: {
+            digitSeparator: true,
+            places: 0
+          }
+        }]
+      }
+    });
+
+    // configure parameters for the renderer generator.
+    // the layer must be specified along with a field name
+    // or arcade expression. The basemap and other properties determine
+    // the appropriate default color and size schemes.
+
+    var params = {
+      layer: povLyr,
+      basemap: map.basemap,
+      field: "price",
+      view: view,
+      symbolType: "3d-volumetric",
+      minValue: 0
+    };
+
+    // Initialize the object containing slider properties.
+    var sliderParams = {
+      container: "slider"
+    };
+
+//    view.then(function() {
+//      view.goto({
+//        center:[121, 31],
+//        zoom: 6,
+//        heading: 30,
+//        tilt: 60
+//      })
+//    });
+
+    // Generate a renderer visualizing a single variable
+    // with continuous color and size based on the
+    // statistics of the data in the provided layer
+    // and field name.
+    //
+    // This resolves to an object containing several helpful
+    // properties, including size/color schemes, statistics,
+    // the renderer, and visual variables
+
+    colorAndSizeRendererCreator.createContinuousRenderer(params)
+      .then(function(response) {
+
+        // set generated renderer on the layer and add it to the map
+
+        povLyr.renderer = response.renderer;
+        map.add(povLyr);
+
+        // set the queried statistics and generated visual variable
+        // to the slider parameters
+
+        var sizeVVs = lang.clone(response.size.visualVariables);
+        var colorVV = lang.clone(response.color.visualVariable);
+
+        var sliderVisualVariables = sizeVVs;
+        sliderVisualVariables.push(colorVV);
+
+        sliderParams.statistics = response.statistics;
+        sliderParams.visualVariables = sliderVisualVariables;
+
+        // generate a histogram for use in the slider. Input the layer
+        // and field name to generate it.
+        // You can also use an arcade expression instead of
+        // a field and normalization field
+
+        return histogram({
+          layer: povLyr,
+          field: params.field
+        });
+      })
+      .then(function(histogram) {
+
+        // when the promise resolves, set the histogram in the slider parameters
+        sliderParams.histogram = histogram;
+
+        // input the slider parameters in the slider's constructor
+        // and add it to the view's UI
+
+        var slider = new UnivariateColorSizeSlider(sliderParams);
+        view.ui.add("containerDiv", "bottom-left");
+
+        // when the user slides the handle(s), update the renderer
+        // with the updated color and size visual variable objects
+
+        on(slider, "data-change", function() {
+          var renderer = povLyr.renderer.clone();
+          renderer.visualVariables = lang.clone(slider.visualVariables);
+          povLyr.renderer = renderer;
+        });
+
+      })
+      .otherwise(function(err) {
+        console.log("there was an error: ", err);
+      });
+
+  });
+</script>
+</html>

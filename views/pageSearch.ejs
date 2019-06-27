@@ -1,0 +1,384 @@
+<div class="pageSearch container active">
+    <h2>文化产业查询</h2>
+    <br>
+    <span> 输入名字进行查找</span>
+    <input type="text" id="inputTxt" size="40" value="希蒙广告艺术装饰中心" />
+
+    <a class="button button-glow button-border button-rounded button-small" id="findBtn">搜索</a>
+
+    <br>
+    <br>
+    <div class="table">
+    <table id="example" style="width:1000px;margin:10px 120px">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>公司</th>
+            <th>联系方式</th>
+            <th>地址</th>
+            <th>FEATCODE</th>
+        </tr>
+        </thead>
+        <tbody>
+    </table>
+    </div>
+    <!--<table id="tbl"></table>-->
+    <!--<div class="panel-side">-->
+        <!--<h2>列表</h2>-->
+        <!--<ul id="nyc_graphics">-->
+            <!--<li>Loading&hellip;</li>-->
+        <!--</ul>-->
+    <!--</div>-->
+    <div id="sceneDiv" style="width: 85%;padding: 0 90px"></div>
+
+</div>
+
+<link rel="stylesheet" href="https://js.arcgis.com/4.3/esri/css/main.css">
+<script src="https://js.arcgis.com/4.3/"></script>
+
+<script>
+    require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/layers/FeatureLayer",
+            "esri/tasks/FindTask",
+            "esri/tasks/support/FindParameters",
+            "esri/symbols/SimpleMarkerSymbol",
+            "esri/symbols/SimpleLineSymbol",
+            "esri/symbols/SimpleFillSymbol",
+            "esri/Graphic",
+            "dojo/query",
+            "dijit/a11yclick",
+            "dojo/on",
+            "dojo/dom",
+            "dojo/dom-attr",
+            "dojo/dom-construct",
+            "dojo/domReady!"
+        ],
+        function(
+            Map, MapView,
+            FeatureLayer,
+            FindTask,FindParameters,SimpleMarkerSymbol,SimpleLineSymbol,SimpleFillSymbol,Graphic,query,
+            a11yclick,
+            on,
+            dom, domAttr, domConstruct
+        ) {
+            var table = $('#example').DataTable({
+                "aotuwidth": false,
+                "bProcessing": true,
+                "bPaginage": true,
+                "sPaginationType": "full_numbers",
+                "oLanguage": {
+                    "sLengthMenu": "每页显示 _MENU_ 条",
+                    "sZeroRecords": "没有找到符合条件的数据",
+                    "sInfo": "当前第 _START_ - _END_ 条　共计 _TOTAL_ 条",
+                    "sInfoEmpty": "没有记录",
+                    "sInfoFiltered": "(从 _MAX_ 条记录中过滤)",
+                    "sSearch": "搜索",
+                    "sProcessing": "数据加载中...",
+                    "oPaginate": {
+                        "sFirst": "首页",
+                        "sPrevious": "上一页",
+                        "sNext": "下一页",
+                        "sLast": "尾页"
+                    }
+                }
+            });
+            //创建属性查询对象
+            var find = new FindTask({
+                url: "http://10.60.42.201:6447/arcgis/rest/services/上海POI/MapServer"
+            });
+            //创建属性查询参数
+            var params = new FindParameters({
+                layerIds: [0],
+                searchFields: ["NAMEC"]
+            });
+            // Executes on each button click
+            function doFind() {
+                // Display loading gif to provide the user feedback on search progress
+                // Set the search text to the value of the input box
+                params.searchText = document.getElementById("inputTxt").value;
+                // The execute() performs a LIKE SQL query based on the provided text value
+                // showResults() is called once the promise returned here resolves
+                // find.execute(params).then(showResults, rejectedPromise);
+                table.clear();
+                table.draw();
+                find.execute(params)
+                    .then(showResults);
+            }
+//
+//            var resultsTable = document.getElementById("tbl");
+
+            // Executes when the promise from find.execute() resolves
+            function showResults(response) {
+
+                var results = response.results;
+
+                // Clear the cells and rows of the table to make room for new results
+//                resultsTable.innerHTML = "";
+//
+//                // If no results are returned from the task, notify the user
+//                if (results.length === 0) {
+//                    resultsTable.innerHTML = "<i>No results found</i>";
+//                    return;
+//                }
+
+                // Set up row for descriptive headers to display results
+//                var topRow = resultsTable.insertRow(0);
+//                var cell1 = topRow.insertCell(0);
+//                var cell2 = topRow.insertCell(1);
+//                var cell3 = topRow.insertCell(2);
+//                var cell4 = topRow.insertCell(3);
+//                var cell5 = topRow.insertCell(4);
+//                cell1.innerHTML = "<b>ID</b>";
+//                cell2.innerHTML = "<b>公司</b>";
+//                cell3.innerHTML = "<b>联系方式</b>";
+//                cell4.innerHTML = "<b>地址</b>";
+//                cell5.innerHTML = "<b>FEATCODE</b>"
+
+
+
+                // Loop through each result in the response and add as a row in the table
+                results.forEach(function(findResult, i) {
+
+
+                    // Get each value of the desired attributes
+                    var county = findResult.feature.attributes[
+                        "ID"];
+                    var state = findResult.feature.attributes[
+                        "NAMEC"];
+                    if(findResult.feature.attributes["TEL"] === "Null")
+                        var pop2000 = "无";
+                    else
+                        var pop2000 = findResult.feature.attributes["TEL"];
+                    var popSQMI = findResult.feature.attributes[
+                        "ADDRESS"];
+                    var featcode = findResult.feature.attributes["FEATCODE"];
+
+                    table.row.add([county,state,pop2000,popSQMI,featcode]).draw();
+                });
+            }
+
+            // Executes each time the promise from find.execute() is rejected.
+            function rejectedPromise(err) {
+                table.clear();
+                //console.error("Promise didn't resolve: ", err.message);
+            }
+
+            // Run doFind() when button is clicked
+            document.getElementById("findBtn").addEventListener("click", doFind);
+
+
+
+            var map = new Map({
+                basemap: "oceans"
+            });
+            var view = new MapView({
+                container: "sceneDiv",
+                map: map,
+                center: [121, 31],
+                zoom: 11,
+                padding: {
+                    right: 300
+                }
+            });
+//            var listNode = dom.byId("nyc_graphics");
+            /********************
+             * Add feature layer
+             ********************/
+                // Create the PopupTemplate
+            var popupTemplate = {
+                    title: "文化产业详细信息",
+                    content: "<p> ID: {ID}</p>" + "<p><b> 公司名: {NAMEC} </b></p>" +
+                    "<p> FEATECODE: {FEATCODE}</p>" +  "<p> 地址: {ADDRESS}</p>" + "<p> 联系方式: {TEL}</p>"
+                };
+
+            // Create the FeatureLayer using the popupTemplate
+            var featureLayer = new FeatureLayer({
+                url: "http://10.60.42.201:6447/arcgis/rest/services/上海POI/MapServer/0",
+                outFields: ["*"],
+                popupTemplate: popupTemplate
+            });
+            map.add(featureLayer);
+            var graphics;
+            view.whenLayerView(featureLayer).then(function(lyrView) {
+                lyrView.watch("updating", function(val) {
+                    if (!val) { // wait for the layer view to finish updating
+                        // query all the features available for drawing.
+                        lyrView.queryFeatures().then(function(results) {
+                            graphics = results;
+                            var fragment = document.createDocumentFragment();
+                            results.forEach(function(result, index) {
+                                var attributes = result.attributes;
+                                var name = attributes.NAMEC + " (" +
+                                    attributes.FEATCODE + ")"
+                                // Create a list zip codes in NY
+                                domConstruct.create("li", {
+                                    className: "panel-result",
+                                    tabIndex: 0,
+                                    "data-result-id": index,
+                                    textContent: name
+                                }, fragment);
+                            });
+                            domConstruct.place(fragment, listNode, "only");
+                        });
+                    }
+                });
+            });
+
+            var nameArr=[];//用于存储查询地点名称
+            var points = [];
+            query("#findBtn").on("click",function(){
+                var name=dom.byId("inputTxt").value;//获得输入框的值
+                for(var i = 0 ;i<points.length;i++){
+                    view.graphics.remove(points[i]);
+                    //points.remove(points[i]);
+                }
+                //实例化查询参数
+                var findParams = new FindParameters();
+                findParams.returnGeometry = true;
+                findParams.layerIds = [0];//对地级城市和省记性查询
+                findParams.searchFields = ["NAMEC"];//匹配图层中的name属性
+                findParams.searchText = name;
+                //实例化查询对象
+                var findTask = new FindTask("http://10.60.42.201:6447/arcgis/rest/services/上海POI/MapServer");
+                //进行查询
+                findTask.execute(findParams)
+                    .then(showFindResult);
+            });
+            function showFindResult(queryResult) {
+                //初始化信息暂存数组
+                nameArr = [];
+
+                if (queryResult.length === 0) {
+                    alert("查询无结果");
+                    return;
+                }
+                for (var i = 0; i < queryResult.results.length; i++) {
+                    nameArr[i] = queryResult.results[i].feature.attributes.NAMEC;
+
+                    //定义高亮图形的符号
+                    var pointSymbol = new SimpleMarkerSymbol({
+                        style: "cross",
+                        size: 15,
+                        outline: { // autocasts as new SimpleLineSymbol()
+                            width: 4
+                        }
+                    });
+                    var outline = new SimpleLineSymbol({
+                        color: [0, 0, 255, 0.5],
+                        width: 5
+                    });
+                    //var PolygonSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, outline, new Color([0, 255, 0, 1])); //定义面符号
+
+                    var graphic = {}; //创建graphic
+                    var locationPoint = {};//创建定位点
+                    var geometry = queryResult.results[i].feature.geometry;//获得该图形的形状
+                    if (geometry.type === "polygon") {
+                        graphic = new Graphic(geometry, PolygonSymbol);
+                        locationPoint = geometry.getCentroid();
+                    }
+                    else if (geometry.type === "point") {
+                        graphic = new Graphic(geometry, pointSymbol);
+                        locationPoint = geometry;
+                    }
+                    //将图形添加到map中
+                    view.graphics.add(graphic);
+                    points.push(graphic);
+                    //map.centerAndZoom(locationPoint, 1);
+                }
+            }
+
+
+
+            // listen to click event on the zip code list
+//            on(listNode, on.selector("li", a11yclick), function(event) {
+//                var target = event.target;
+//                var resultId = domAttr.get(target, "data-result-id");
+//                // get the graphic corresponding to the clicked zip code
+//                var result = resultId && graphics && graphics[parseInt(resultId,
+//                    10)];
+//                if (result) {
+//                    // open the popup at the centroid of zip code polygon
+//                    // and set the popup's features which will populate popup content and title.
+//                    view.popup.open({
+//                        features: [result],
+//                        location: result.geometry.centroid
+//                    });
+//                }
+//            });
+        });
+</script>
+
+<style>
+    #sceneDiv {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+    }
+    .table{
+        width:1000px;
+        margin:10px 220px;
+        text-align: center;
+    }
+    .pageSearch.container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+    .pageSearch.container.active {
+        display: none;
+    }
+    .pageSearch.container > h2 {
+        align-self: flex-start;
+        color: #0088f5;
+        font-size: 5em;
+        margin: 20px;
+        text-indent:30px;
+    }
+    .pageSearch.container > span{
+        font-size: 2em;
+        margin: 20px 10px 10px 90px;
+        text-indent: 30px;
+        letter-spacing: 1px;
+        line-height: 2;
+    }
+    .panel-side {
+        padding: 2px;
+        box-sizing: border-box;
+        width: 300px;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        color: #fff;
+        background-color: rgba(0, 0, 0, 0.6);
+        overflow: auto;
+        z-index: 60;
+    }
+    .panel-side h2 {
+        padding: 0 20px;
+        margin: 20px 0;
+    }
+    .panel-side ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    .panel-side li {
+        list-style: none;
+        padding: 10px 20px;
+    }
+    .panel-result {
+        cursor: pointer;
+        margin: 2px 0;
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+    .panel-result:hover,
+    .panel-result:focus {
+        color: orange;
+        background-color: rgba(0, 0, 0, 0.75);
+    }
+</style>

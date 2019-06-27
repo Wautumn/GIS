@@ -1,0 +1,422 @@
+<div class="pageecoAddress container active">
+    <h2>环同济经济圈创业园区选址</h2>
+    <span>文化创业产业园的选址需要进行全方位的考虑，这里主要考虑交通因素和房价因素。文化创业产业园区想要获得长远的发展，必须具备便利的交通条件，最好靠近交通枢纽进行选址，便于发挥区位优势。在园区的选址上要注意合理利用土地，尽量降低开发费用，提高节约用地意识，尽量使用荒地，杨浦区作为上海城区，环同济经济圈作为杨浦的重心，在建立创业园区的时候，应该尽量房价较低的地点，减少搬迁居民带来的建设成本与开发阻力，达到节约成本的要求。</span>
+    <span> 为了方便评价环同济经济圈不同地点作为文化创业产业园的选址优劣，我们选择以同济大学为内沿，向外辐射1公里的圆环区域作为我们的研究区域，并且以30°为单位，等分成12份。</span>
+    <span>变量定义：</span>
+    <span>表示第个区域， 1<=i<=12</span>
+    <span>Pi表示第i个区域内所有楼盘房价的均价</span>
+    <span>Dmain表示第i个区域内经过的所有主要道路的个数</span>
+    <span>Dsec表示第i个区域内经过的所有次要道路的个数</span>
+    <span>Di = 2Dmain + Dsec 代表了第i个区域交通的评价指标</span>
+    <span>寻址模型：</span>
+    <span>MaxZi = Di / Pi</span>
+    <span>Di 越大意味着该区域的交通情况越良好，越小意为着该地区的房价越低，越适合作为创业园区,因此求解模型即是求最小的Z值。</span>
+
+    <div class="selectAddress" style="margin:0">
+
+        <span class="placeholder">底图选择</span>
+        <ul>
+            <li value="oceans">oceans</li>
+            <li value="gray">gray</li>
+            <li value="national-geographic">national-geographic</li>
+            <li value="hybrid">hybrid</li>
+            <li value="osm">osm</li>
+            <li value="satellite">satellite</li>
+            <li value="streets">streets</li>
+            <li value="topo">topo</li>
+        </ul>
+    </div>
+    <div id="viewDivAddress"></div>
+</div>
+<script>
+
+    var basemap = "";
+    $('.selectAddress').on('click', '.placeholder', function(e) {
+        var parent = $(this).closest('.selectAddress');
+        if (!parent.hasClass('is-open')) {
+            parent.addClass('is-open');
+            $('.selectAddress.is-open').not(parent).removeClass('is-open');
+        } else {
+            parent.removeClass('is-open');
+        }
+        e.stopPropagation();
+    }).on('click', 'ul>li', function() {
+        var parent = $(this).closest('.selectAddress');
+        parent.removeClass('is-open').find('.placeholder').text($(this).text());
+        basemap = this.attributes[0].value;
+
+        require([
+            "esri/Map",
+            "esri/views/SceneView",
+            "esri/layers/FeatureLayer",
+            "esri/renderers/smartMapping/creators/size",
+            "esri/renderers/smartMapping/statistics/histogram",
+            "esri/widgets/SizeSlider",
+            "esri/widgets/Legend",
+            "esri/core/lang",
+            "dojo/on",
+            "dojo/domReady!"
+        ], function(Map, SceneView, FeatureLayer,sizeRendererCreator, histogram,
+                    SizeSlider, Legend, lang, on) {
+            var template = {
+                title: "寻址模型：MaxZi = Di / Pi",
+                content: "Z值：{Join_Count}",
+                fieldInfos: [{
+                    fieldName: "MARRIED_CY",
+                    format: {
+                        digitSeparator: true, // Use a comma separator for large numbers
+                        places: 0 // Sets the number of decimal places to 0 and rounds up
+                    }
+                }, {
+                    fieldName: "NEVMARR_CY",
+                    format: {
+                        digitSeparator: true,
+                        places: 0
+                    }
+                }, {
+                    fieldName: "DIVORCD_CY",
+                    format: {
+                        digitSeparator: true,
+                        places: 0
+                    }
+                }]
+            };
+
+            // Create the Map
+            var map = new Map({
+                basemap: basemap,
+                ground: "world-elevation",
+                logo: false
+            });
+
+            // Create the MapView
+            var view = new SceneView({
+                container: "viewDivAddress",
+                map: map,
+                zoom: 12,  // Sets the zoom level based on level of detail (LOD)
+                center: [121, 31]  // Sets the center point of view in lon/lat
+            });
+
+
+            var povLyr = new FeatureLayer({
+                url: "http://10.60.42.201:6447/arcgis/rest/services/环同济经济圈寻址模型/MapServer/0",
+
+                outFields: ["*"],
+                popupTemplate: {
+                    title: "寻址模型：MaxZi = Di / Pi",
+                    content: "该地区Z值为 {Z_value}."
+                }
+            });
+
+            var sizeParams = {
+                layer: povLyr,
+                basemap: map.basemap,
+                field: "Z_value",
+                //normalizationField: "avg_price",
+                legendOptions: {
+                    title: "Ratio of people living in poverty"
+                },
+                minValue: 0.15
+            };
+
+            // Initialize the object containing size slider properties.
+            var sliderParams = {
+                container: "slider"
+            };
+            sizeRendererCreator.createContinuousRenderer(sizeParams)
+                .then(function (response) {
+
+                    // set generated renderer on the layer and add it to the map
+
+                    povLyr.renderer = response.renderer;
+                    map.add(povLyr);
+
+                    // set the queried statistics and generated visual variable
+                    // to the slider parameters
+
+                    sliderParams.statistics = response.statistics;
+                    sliderParams.visualVariable = lang.clone(response.visualVariables[
+                        0]);
+
+                    // Create a legend and add it to the view's UI
+
+                    var legend = new Legend({
+                        view: view,
+                        layerInfos: [
+                            {
+                                layer: povLyr,
+                                title: ""
+                            }]
+                    });
+                    view.ui.add(legend, "bottom-right");
+
+                    // generate a histogram for use in the slider. Input the layer
+                    // and field name to generate it.
+
+                    return histogram({
+                        layer: povLyr,
+                        field: sizeParams.field,
+                        normalizationField: sizeParams.normalizationField,
+                        minValue: sizeParams.minValue
+                    });
+
+                })
+                .then(function (histogram) {
+
+                    // when the promise resolves, set the histogram in the slider parameters
+
+                    sliderParams.histogram = histogram;
+
+                    // input the slider parameters in the slider's constructor
+                    // and add it to the view's UI
+
+                    sizeSlider = new SizeSlider(sliderParams);
+                    view.ui.add("containerDiv", "bottom-left");
+
+                    // when the user slides the handle(s), update the renderer
+                    // with the updated color visual variable object
+                    on(sizeSlider, "handle-value-change", function () {
+                        var renderer = povLyr.renderer.clone();
+                        renderer.visualVariables = [lang.clone(sizeSlider.visualVariable)];
+                        povLyr.renderer = renderer;
+                    });
+                })
+                .otherwise(function (err) {
+                    console.log("there was an error: ", err);
+                });
+        })
+    })
+
+
+
+
+    require([
+        "esri/Map",
+        "esri/views/SceneView",
+        "esri/layers/FeatureLayer",
+        "esri/renderers/smartMapping/creators/size",
+        "esri/renderers/smartMapping/statistics/histogram",
+        "esri/widgets/SizeSlider",
+        "esri/widgets/Legend",
+        "esri/core/lang",
+        "dojo/on",
+        "dojo/domReady!"
+    ], function(Map, SceneView, FeatureLayer,sizeRendererCreator, histogram,
+                SizeSlider, Legend, lang, on){
+        var template = {
+            title: "寻址模型：MaxZi = Di / Pi",
+            content: "Z值：{Join_Count}",
+            fieldInfos: [{
+                fieldName: "MARRIED_CY",
+                format: {
+                    digitSeparator: true, // Use a comma separator for large numbers
+                    places: 0 // Sets the number of decimal places to 0 and rounds up
+                }
+            }, {
+                fieldName: "NEVMARR_CY",
+                format: {
+                    digitSeparator: true,
+                    places: 0
+                }
+            }, {
+                fieldName: "DIVORCD_CY",
+                format: {
+                    digitSeparator: true,
+                    places: 0
+                }
+            }]
+        };
+
+        // Create the Map
+        var map = new Map({
+            basemap: "oceans",
+            ground: "world-elevation",
+            logo:false
+        });
+
+        // Create the MapView
+        var view = new SceneView({
+            container: "viewDivAddress",
+            map: map,
+            zoom: 12,  // Sets the zoom level based on level of detail (LOD)
+            center: [121, 31]  // Sets the center point of view in lon/lat
+        });
+
+
+        var povLyr = new FeatureLayer({
+            url: "http://10.60.42.201:6447/arcgis/rest/services/环同济经济圈寻址模型/MapServer/0",
+            outFields: ["*"],
+            popupTemplate: {
+                title: "寻址模型：MaxZi = Di / Pi",
+                content: "该地区Z值为 {Z_value}."
+            }
+        });
+
+
+        var sizeParams = {
+            layer: povLyr,
+            basemap: map.basemap,
+            field: "Z_value",
+            //normalizationField: "avg_price",
+            legendOptions: {
+                title: "Ratio of people living in poverty"
+            },
+            minValue: 0.15
+        };
+
+        // Initialize the object containing size slider properties.
+        var sliderParams = {
+            container: "slider"
+        };
+        sizeRendererCreator.createContinuousRenderer(sizeParams)
+            .then(function(response) {
+
+                // set generated renderer on the layer and add it to the map
+
+                povLyr.renderer = response.renderer;
+                map.add(povLyr);
+
+
+                // set the queried statistics and generated visual variable
+                // to the slider parameters
+
+                sliderParams.statistics = response.statistics;
+                sliderParams.visualVariable = lang.clone(response.visualVariables[
+                    0]);
+
+                // Create a legend and add it to the view's UI
+
+                var legend = new Legend({
+                    view: view,
+                    layerInfos: [
+                        {
+                            layer: povLyr,
+                            title: ""
+                        }]
+                });
+                view.ui.add(legend, "bottom-right");
+
+                // generate a histogram for use in the slider. Input the layer
+                // and field name to generate it.
+
+                return histogram({
+                    layer: povLyr,
+                    field: sizeParams.field,
+                    normalizationField: sizeParams.normalizationField,
+                    minValue: sizeParams.minValue
+                });
+
+            })
+            .then(function(histogram) {
+
+                // when the promise resolves, set the histogram in the slider parameters
+
+                sliderParams.histogram = histogram;
+
+                // input the slider parameters in the slider's constructor
+                // and add it to the view's UI
+
+                sizeSlider = new SizeSlider(sliderParams);
+                view.ui.add("containerDiv", "bottom-left");
+
+                // when the user slides the handle(s), update the renderer
+                // with the updated color visual variable object
+                on(sizeSlider, "handle-value-change", function() {
+                    var renderer = povLyr.renderer.clone();
+                    renderer.visualVariables = [lang.clone(sizeSlider.visualVariable)];
+                    povLyr.renderer = renderer;
+                });
+            })
+            .otherwise(function(err) {
+                console.log("there was an error: ", err);
+            });
+
+//        var featureLayer = new FeatureLayer({
+//            url: "https://10.60.42.201:6442/arcgis/rest/services/环同济经济圈园区选址/MapServer/0",
+//            outFields: ["*"],
+//            popupTemplate: template
+//        });
+//
+////        var featureLayer2 = new FeatureLayer({
+////            url: "https://10.60.42.201:6442/arcgis/rest/services/环同济经济圈/MapServer/0",
+////            outFields: ["*"],
+////            popupTemplate: template
+////        });
+//
+//
+//        view.then(function() {
+//            featureLayer.then(function() {
+//                view.goTo(featureLayer.fullExtent);
+//            });
+////            featureLayer2.then(function() {
+////                view.goTo(featureLayer.fullExtent);
+////            });
+//        });
+//
+//
+//        map.add(featureLayer)
+////        map.add(featureLayer2)
+
+    });
+
+</script>
+
+
+<style>
+    #viewDivAddress{
+        padding: 0;
+        margin: 40px 10px;
+        height: 40%;
+        width: 100%;
+        max-width: calc(100% - 202px);
+
+    }
+
+    #viewDivAddress.active {
+        display: none;
+    }
+
+    .pageecoAddress.container {
+        display: flex;
+        display: -webkit-flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    .pageecoAddress.container > div {
+        margin: 20px;
+    }
+
+    .pageecoAddress.container > h2 {
+        align-self: flex-start;
+        color: #0088f5;
+        font-size: 5em;
+        margin: 20px;
+        text-indent:30px;
+    }
+    .pageecoAddress.container > span{
+        font-size: 2em;
+        width:100rem;
+        text-indent: 30px;
+        letter-spacing: 1px;
+        line-height: 2;
+    }
+    .pageecoAddress.container.active {
+        display: none;
+    }
+    .selectAddress { position: relative; display: block; margin: 0 auto; width: 10%; max-width: 325px; color: #cccccc; vertical-align: middle; text-align: left; user-select: none; -webkit-touch-callout: none;}
+    .selectAddress .placeholder { position: relative; display: block; background-color: #393d41; z-index: 1; padding: 1em; border-radius: 2px; cursor: pointer;}
+    .selectAddress .placeholder:hover { background: #34383c;}
+    .selectAddress .placeholder:after { position: absolute; right: 1em; top: 50%; transform: translateY(-50%); font-family: 'FontAwesome'; content: '\f078'; z-index: 10;}
+    .selectAddress.is-open .placeholder:after { content: '\f077';}
+    .selectAddress.is-open ul { display: block;}
+    .selectAddress.selectAddress--white .placeholder { background: #fff; color: #999;}
+    .selectAddress.selectAddress--white .placeholder:hover { background: #fafafa;}
+    .selectAddress.selectAddress--green .placeholder { background: #5BF36E; color: #FFF;}
+    .selectAddress.selectAddress--green .placeholder:hover { background: #5BF36E;}
+    .selectAddress ul { display: none; position: absolute; overflow: hidden; width: 100%; background: #fff; border-radius: 2px; top: 100%; left: 0; list-style: none; margin: 5px 0 0 0; padding: 0; z-index: 100;}
+    .selectAddress ul li { display: block; text-align: left; padding: 0.8em 1em 0.8em 1em; color: #999; cursor: pointer;}
+    .selectAddress ul li:hover { background: #4ebbf0; color: #fff;}
+</style>

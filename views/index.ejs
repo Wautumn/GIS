@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/index.css"/>
+    <link rel="stylesheet" href="/stylesheets/button.css"/>
+    <link rel="stylesheet" href="/stylesheets/mscarousel.css"/>
+    <link rel="stylesheet" href="/stylesheets/button.css"/>
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.12/css/jquery.dataTables.css">
+    <!-- DataTables -->
+    <script type="text/javascript" charset="utf8" src="/javascripts/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/javascripts/jquery.msCarousel-min.js"></script>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.3/esri/css/main.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/4.3/dijit/themes/claro/claro.css">
+    <script src="/javascripts/echarts.min.js"></script>
+
+    <script src="https://js.arcgis.com/4.3/"></script>
+
+</head>
+<body>
+<div class="main-container">
+    <div class="sider-bar">
+        <div class="three">
+            <!--<img src="/images/three1.svg" alt="">-->
+        </div>
+        <div class="item" onmouseover="activeMsg(1)" onmouseout="removeActiveId()" onclick="activeSub(event)">
+            <img src="/images/more.svg" alt="" id="pic-one">
+            <p>文化产业分布</p>
+            <div class="aside" id="msg-one">
+                <span>文化产业分布</span>
+            </div>
+        </div>
+        <div class="sub">
+            <ul>
+                <li>
+                    <a onclick="changePage(1, 1)">上海文化产业分布图</a>
+                </li>
+                <li>
+                    <a onclick="changePage(1, 2)">人民广场分布</a>
+                </li>
+                <li>
+                    <a onclick="changePage(1, 3)">文化产业查询</a>
+                </li>
+                <li>
+                    <a onclick="changePage(1, 4)">环线文化产业分布图</a>
+                </li>
+                <li>
+                    <a onclick="changePage(1, 5)">测试</a>
+                </li>
+            </ul>
+        </div>
+        <div class="item" onmouseover="activeMsg(2)" onmouseout="removeActiveId()" onclick="activeSub(event)">
+            <img src="/images/more.svg" alt="">
+            <p>文化历史因素</p>
+            <div class="aside" id="msg-two">
+                <span>文化历史因素</span>
+            </div>
+        </div>
+        <div class="sub">
+            <ul>
+
+                <li>
+                    <a onclick="changePage(2, 3)">历史对比</a>
+                </li>
+            </ul>
+        </div>
+        <div class="item" onmouseover="activeMsg(3)" onmouseout="removeActiveId()" onclick="changePage(3)">
+            <img src="/images/more.svg" alt="">
+            <p>文化产业热点</p>
+            <div class="aside" id="msg-three">
+                <span>文化产业热点</span>
+            </div>
+        </div>
+        <div class="item" onmouseover="activeMsg(4)" onmouseout="removeActiveId()" onclick="changePage(4)">
+            <img src="/images/more.svg" alt="">
+            <p>交通压力分析</p>
+            <div class="aside" id="msg-four">
+                <span>交通压力分析</span>
+            </div>
+        </div>
+        <div class="item" onmouseover="activeMsg(5)" onmouseout="removeActiveId()" onclick="activeSub(event)">
+            <img src="/images/more.svg" alt="">
+            <p>文化产业重新规划</p>
+            <div class="aside" id="msg-five">
+                <span>文化产业重新规划</span>
+            </div>
+        </div>
+        <div class="sub">
+            <ul>
+                <li>
+                    <a onclick="changePage(5, 1)">房价水平</a>
+                </li>
+                <li>
+                    <a onclick="changePage(5, 2)">Huff 模型</a>
+                </li>
+            </ul>
+        </div>
+        <!--<div class="item" onmouseover="activeMsg(7)" onmouseout="removeActiveId()" onclick="changePage(7)">-->
+        <!--<img src="/images/more.svg" alt="">-->
+        <!--<p>热点区域分析</p>-->
+        <!--<div class="aside" id="msg-seven">-->
+        <!--<span>热点区域分析</span>-->
+        <!--</div>-->
+        <!--</div>-->
+        <div class="item" onmouseover="activeMsg(9)" onmouseout="removeActiveId()" onclick="activeSub(event)">
+            <img src="/images/more.svg" alt="">
+            <p>环同济经济圈</p>
+            <div class="aside" id="msg-nine">
+                <span>环同济经济圈</span>
+            </div>
+        </div>
+        <div class="sub">
+            <ul>
+                <li>
+                    <a onclick="changePage(9, 1)">环同济经济圈文化产业</a>
+                </li>
+                <li>
+                    <a onclick="changePage(9, 2)">环同济经济圈创业园区选址</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="sub-container" style="height:170rem">
+        <!--地图-->
+        <% include pageOne.ejs %>
+        <% include pageTwo.ejs %>
+        <% include pageThree.ejs %>
+        <% include pageFour.ejs %>
+        <% include pageFive.ejs %>
+        <% include pageEight.ejs %>
+        <% include pageHot.ejs %>
+        <% include pageLoopLine.ejs %>
+        <% include ecoCircle.ejs %>
+        <% include pageSearch.ejs %>
+        <% include ecoCircleAddress.ejs %>
+        <% include myclass.ejs %>
+    </div>
+</div>
+
+<script>
+
+    var active = false;
+    var activeId = -1;
+    var subId = -1;
+    var curPage = 1;
+
+    $(document).ready(function () {
+
+    });
+
+    function activeMsg(id) {
+        activeId = id;
+        if (active && activeId === 1) {
+            $('#msg-one').addClass('active')
+        } else if (active && activeId === 2) {
+            $('#msg-two').addClass('active')
+        } else if (active && activeId === 3) {
+            $('#msg-three').addClass('active')
+        } else if (active && activeId === 4) {
+            $('#msg-four').addClass('active')
+        } else if (active && activeId === 5) {
+            $('#msg-five').addClass('active')
+        } else if (active && activeId === 6) {
+            $('#msg-six').addClass('active')
+        } else if (active && activeId === 7) {
+            $('#msg-seven').addClass('active')
+        } else if (active && activeId === 9) {
+            $('#msg-nine').addClass('active')
+        }
+
+    }
+
+    function removeActiveId() {
+        activeId = -1;
+        $('#msg-one').removeClass('active')
+        $('#msg-two').removeClass('active')
+        $('#msg-three').removeClass('active')
+        $('#msg-four').removeClass('active')
+        $('#msg-five').removeClass('active')
+        $('#msg-six').removeClass('active')
+        $('#msg-seven').removeClass('active')
+        $('#msg-nine').removeClass('active')
+    }
+
+
+    function activeSub(event) {
+        var e = event.currentTarget
+        if (e.childNodes[1].getAttribute('src') === '/images/more.svg') {
+            e.childNodes[1].src = '/images/arrow-down.svg'
+            e.nextElementSibling.className = 'sub active'
+        } else if (e.childNodes[1].getAttribute('src') === '/images/arrow-down.svg') {
+            e.nextElementSibling.className = 'sub'
+            e.childNodes[1].src = '/images/more.svg'
+
+        }
+    }
+
+    function changePage(pageId) {
+        curPage = pageId;
+        if (curPage === 1) {
+            subId = arguments[1];
+            if (subId === 1) {
+                clearPage();
+                $('.pageOne').removeClass('active');
+            } else if (subId === 2) {
+                clearPage();
+                $('.pageThree').removeClass('active');
+            } else if (subId === 3) {
+                clearPage();
+                $('.pageSearch').removeClass('active');
+            } else if (subId === 4) {
+                clearPage();
+                $('.pageLoopLine').removeClass('active');
+            } else if (subId === 5) {
+                clearPage();
+                $('.myclass').removeClass('active');
+            }
+        } else if (curPage === 2) {
+            subId = arguments[1];
+            clearPage();
+            $('.pageTwo').removeClass('active');
+            clearMap();
+            if (subId === 1) {
+                $('#2-1').removeClass('active');
+            } else if (subId === 2) {
+                $('#2-2').removeClass('active');
+            } else if (subId === 3) {
+                $('#2-3').removeClass('active');
+            }
+        } else if (curPage === 3) {
+            clearPage();
+            $('.pageHot').removeClass('active');
+        } else if (curPage === 4) {
+            clearPage();
+            $('.pageFour').removeClass('active');
+        } else if (curPage === 5) {
+            subId = arguments[1];
+            clearPage();
+            $('.pageFive').removeClass('active');
+            clearMap();
+            if (subId === 1) {
+                $('#5-1').removeClass('active');
+            } else if (subId === 2) {
+                $('#5-2').removeClass('active');
+            }
+        } else if (curPage === 7) {
+            window.open('/analytics', '_blank')
+        } else if (curPage === 8) {
+            clearPage();
+            $('.pageEight').removeClass('active');
+        } else if (curPage === 9) {
+            subId = arguments[1];
+            if (subId === 1) {
+                clearPage();
+                $('.pageecoCircle').removeClass('active');
+            } else {
+                clearPage();
+                $('.pageecoAddress').removeClass('active');
+            }
+        }
+    }
+
+    function clearPage() {
+        $('.pageOne').addClass('active');
+        $('.pageTwo').addClass('active');
+        $('.pageThree').addClass('active');
+        $('.pageFour').addClass('active');
+        $('.pageFive').addClass('active');
+        $('.pageEight').addClass('active');
+        $('.pageHot').addClass('active');
+        $('.pageLoopLine').addClass('active');
+        $('.pageecoCircle').addClass('active');
+        $('.pageSearch').addClass('active');
+        $('.pageecoAddress').addClass('active');
+        $('.myclass').addClass('active');
+    }
+
+    function clearMap() {
+        $('#2-1').addClass('active');
+        $('#2-2').addClass('active');
+        $('#2-3').addClass('active');
+        $('#5-1').addClass('active');
+        $('#5-2').addClass('active');
+    }
+</script>
+</body>
+</html>
