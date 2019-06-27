@@ -36,22 +36,14 @@
          <el-submenu index="3">
         <template slot="title">
           <i class="el-icon-location"></i>
-          <span>文化产业热点</span>
+          <span>文化产业空间合理性</span>
         </template>
         <el-menu-item-group>
           <el-menu-item index="3-1">热点分析</el-menu-item>
+           <el-menu-item index="3-2">压力分析</el-menu-item>
         </el-menu-item-group>   
       </el-submenu>
-  
-         <el-submenu index="4">
-        <template slot="title">
-          <i class="el-icon-location"></i>
-          <span>交通压力分析</span>
-        </template>
-        <el-menu-item-group>
-          <el-menu-item index="3-1">压力分析</el-menu-item>
-        </el-menu-item-group>   
-      </el-submenu>
+
 
       
          <el-submenu index="5">
@@ -80,7 +72,7 @@
     </el-menu>
     </el-aside>
     <el-main>
-        <ecocircle></ecocircle>
+        <page11></page11>
     </el-main>
 </el-container>
 
@@ -96,9 +88,22 @@
 
 <script>
     import ecocircle from '@/components/ecocircle.vue';
+    import page11 from '@/components/page11.vue';
+    import page31 from '@/components/page31.vue';
+    import page32 from '@/components/page32.vue';
+    import page41 from '@/components/page41.vue';
+    import page42 from '@/components/page42.vue';
+    import page43 from '@/components/page43.vue';
+    
   export default {
       components: {
           ecocircle,
+          page11,
+          page31,
+          page32,
+          page41,
+          page42,
+          page43,
 
       },
     methods: {
