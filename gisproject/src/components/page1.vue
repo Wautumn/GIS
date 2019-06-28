@@ -31,6 +31,8 @@
                         </template>
                         <el-menu-item-group>
                             <el-menu-item index="2-1" @click="handleClick(4)">历史对比</el-menu-item>
+                            <el-menu-item index="2-2" @click="handleClick(13)">布局分析</el-menu-item>
+
                         </el-menu-item-group>
                     </el-submenu>
 
@@ -74,10 +76,10 @@
             <el-main>
                   <div v-if="this.currentindex===0">
                     <div align="center">
-     <el-card>
-         <h2>上海市文化产业分析</h2>
+    <el-card>
+        <h2>上海市文化产业分析</h2>
       <img src="../../static/image/1.png" class="image" style="height: 480px;width: 900px">
-     </el-card>
+      </el-card>
       </div>
                 </div>
                 <div v-if="this.currentindex===1">
@@ -116,6 +118,9 @@
                 <div v-else-if="this.currentindex===12">
                     <page14></page14>
                 </div>
+                <div v-else-if="this.currentindex===13">
+                    <page22></page22>
+                </div>
 
             </el-main>
         </el-container>
@@ -145,6 +150,8 @@
     import page43 from '@/components/page43.vue';
     import page431 from '@/components/page431.vue';
     import page432 from '@/components/page432.vue';
+        import page22 from '@/components/page22.vue';
+
 
     export default {
         components: {
@@ -161,6 +168,7 @@
             page43,
             page431,
             page432,
+            page22,
 
         },
         data() {
