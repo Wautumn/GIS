@@ -21,6 +21,9 @@
     <div align="center">
         <img src="../../static/image/比例地图.jpg" style="height: 500px;width: 780px">
         </div>
+            <div align="center">
+                <img src="../../static/image/比例.jpg" style="height: 500px;width: 780px">
+            </div>
    
 </el-card>
  </div>
