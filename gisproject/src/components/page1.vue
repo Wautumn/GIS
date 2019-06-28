@@ -74,8 +74,10 @@
             <el-main>
                   <div v-if="this.currentindex===0">
                     <div align="center">
-    
-      <img src="../../static/image/比例.png" class="image" style="height: 500px;width: 800px">
+     <el-card>
+         <h2>上海市文化产业分析</h2>
+      <img src="../../static/image/1.png" class="image" style="height: 480px;width: 900px">
+     </el-card>
       </div>
                 </div>
                 <div v-if="this.currentindex===1">

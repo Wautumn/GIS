@@ -2,34 +2,43 @@
     <!--历史对比-->
     <div>
         <el-card>
-        <div>
-           <h2> 嘉定区与杨浦区地图</h2>
-             <el-divider></el-divider>
-             <div align="center">
-            <el-button type="primary" icon="el-icon-search">
-                <a class="a-style"
-                   @click="linkDownload('http://www.arcgis.com/home/webmap/viewer.html?url=http%3A%2F%2F10.60.42.201%3A6447%2Farcgis%2Frest%2Fservices%2FDu%2Fjiading%2FMapServer&source=sd')">查看嘉定区地图
+        <!--<div>-->
+           <!--<h2> 嘉定区与杨浦区地图</h2>-->
+             <!--<el-divider></el-divider>-->
+             <!--<div align="center">-->
+            <!--<el-button type="primary" icon="el-icon-search">-->
+                <!--<a class="a-style"-->
+                   <!--@click="linkDownload('http://www.arcgis.com/home/webmap/viewer.html?url=http%3A%2F%2F10.60.42.201%3A6447%2Farcgis%2Frest%2Fservices%2FDu%2Fjiading%2FMapServer&source=sd')">查看嘉定区地图-->
 
-                </a>
-            </el-button>
-            </div>
-        </div>
-     <br>
-        <div>
-          <div align="center">
-            <el-button type="success" icon="el-icon-search">
-                <a class="a-style"
-                   @click="linkDownload('http://www.arcgis.com/home/webmap/viewer.html?url=http%3A%2F%2F10.60.42.201%3A6447%2Farcgis%2Frest%2Fservices%2FDu%2Fyangpu_reli%2FMapServer&source=sd')">查看杨浦区地图
+                <!--</a>-->
+            <!--</el-button>-->
+            <!--</div>-->
+        <!--</div>-->
+     <!--<br>-->
+        <!--<div>-->
+          <!--<div align="center">-->
+            <!--<el-button type="success" icon="el-icon-search">-->
+                <!--<a class="a-style"-->
+                   <!--@click="linkDownload('http://www.arcgis.com/home/webmap/viewer.html?url=http%3A%2F%2F10.60.42.201%3A6447%2Farcgis%2Frest%2Fservices%2FDu%2Fyangpu_reli%2FMapServer&source=sd')">查看杨浦区地图-->
 
-                </a>
-            </el-button>
-            </div>
-        </div>
+                <!--</a>-->
+            <!--</el-button>-->
+            <!--</div>-->
+        <!--</div>-->
 
         <h2>历史文化因素</h2>
          <el-divider></el-divider>
         <div style="font-size: 16px">
+            <div align="center">
+                <img src="../../static/image/yangpu.jpg" class="image">
+            </div>
+            <br>
             <span>杨浦区历史上作为沪东工业区，聚集了强盛的工业资源与力量，经济快速发展的同时，工厂群众文化也相应而生。境内先后建立起杨浦区工人俱乐部、杨浦区电影院、沪东工人文化宫、杨浦区文化宫、杨浦区图书馆等一批文化事业单位和街道文化站。</span>
+            <br> <br>
+            <div align="center">
+                <img src="../../static/image/huangpu.jpg" class="image">
+            </div>
+            <br>
             <p>黄浦区是海派文化的发源地、民族工业的发祥地、中国共产党的诞生地，在历史发展的过程中，形成了以豫园为代表的老城厢文化、以江南造船厂为代表的近现代工业文化、以外滩万国建筑和上海石库门等经典建筑为代表的建筑文化，和以中共一大会址为代表的红色文化等四大特色文化。</p>
 
             <p>综合分析以上数据可得出以下结论：</p>
